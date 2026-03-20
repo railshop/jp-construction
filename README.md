@@ -292,8 +292,8 @@ This repo is part of the `railshop-starter-*` series:
 | Repo | Description |
 |------|-------------|
 | [`railshop-starter-service`](https://github.com/railshop/railshop-starter-service) | Local service businesses (this repo) |
-| `railshop-starter-saas` | *(coming soon)* |
-| `railshop-starter-ecommerce` | *(coming soon)* |
+| `railshop-starter-nonprofit` | *(coming soon)* |
+| `railshop-starter-agency` | *(coming soon)* |
 
 ---
 
