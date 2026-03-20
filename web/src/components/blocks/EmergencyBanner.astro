@@ -1,0 +1,102 @@
+---
+/**
+ * EmergencyBanner.astro
+ * Dismissible top banner for 24/7 emergency service businesses.
+ * Toggle via site.config features.emergencyBanner
+ */
+
+import { getBusiness } from '../../lib/data';
+
+interface Props {
+  message?: string;
+}
+
+const { message } = Astro.props;
+const business = await getBusiness();
+const displayMessage = message || `24/7 Emergency Service Available — Call ${business.phone} Now`;
+---
+
+<div class="emergency-banner" id="emergency-banner" role="alert">
+  <div class="container">
+    <div class="emergency-banner-inner">
+      <div class="emergency-banner-content">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span class="emergency-text">{displayMessage}</span>
+        <a href={business.phoneHref} class="emergency-cta">Call Now</a>
+      </div>
+      <button class="emergency-close" id="emergency-close" aria-label="Dismiss banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .emergency-banner {
+    background: #dc2626;
+    color: #ffffff;
+    padding-block: var(--space-2);
+  }
+
+  .emergency-banner-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .emergency-banner-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    justify-content: center;
+  }
+
+  .emergency-text {
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .emergency-cta {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
+  .emergency-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: var(--space-1);
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .emergency-close:hover { opacity: 1; }
+</style>
+
+<script>
+  document.getElementById('emergency-close')?.addEventListener('click', () => {
+    const banner = document.getElementById('emergency-banner');
+    if (banner) {
+      banner.style.display = 'none';
+      sessionStorage.setItem('emergencyBannerDismissed', '1');
+    }
+  });
+
+  if (sessionStorage.getItem('emergencyBannerDismissed')) {
+    const banner = document.getElementById('emergency-banner');
+    if (banner) banner.style.display = 'none';
+  }
+</script>

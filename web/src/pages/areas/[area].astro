@@ -1,0 +1,299 @@
+---
+/**
+ * pages/areas/[area].astro — Individual service area page
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServiceCardsGrid from '../../components/blocks/ServiceCardsGrid.astro';
+import Testimonials from '../../components/blocks/Testimonials.astro';
+import FaqAccordion from '../../components/blocks/FaqAccordion.astro';
+import CtaBanner from '../../components/blocks/CtaBanner.astro';
+import RelatedServices from '../../components/blocks/RelatedServices.astro';
+import { getBusiness, getServiceAreas, getServices, getTestimonials, getFaqs } from '../../lib/data';
+import config from '../../site.config';
+
+export async function getStaticPaths() {
+  const areas = await getServiceAreas();
+  return areas.map(a => ({ params: { area: a.slug } }));
+}
+
+const { area: areaSlug }  = Astro.params;
+const business     = await getBusiness();
+const areas        = await getServiceAreas();
+const services     = await getServices();
+const testimonials = await getTestimonials();
+const faqs         = await getFaqs();
+
+const area         = areas.find(a => a.slug === areaSlug)!;
+const nearbyAreas  = area.nearby
+  ? areas.filter(a => (area.nearby as string[]).includes(a.slug))
+  : [];
+
+const areaTestimonials = testimonials.filter(t =>
+  !t.area || (t.area as unknown as string) === areaSlug
+).slice(0, 3);
+
+const localSchema = {
+  '@context': 'https://schema.org',
+  '@type': config.schemaType,
+  name: business.name,
+  description: `${business.name} provides professional services in ${area.name}, ${area.county || business.address.state}.`,
+  telephone: business.phone,
+  url: `${config.siteUrl}/areas/${area.slug}/`,
+  areaServed: {
+    '@type': 'City',
+    name: area.name,
+    ...(area.county && { containedInPlace: { '@type': 'AdministrativeArea', name: area.county } }),
+  },
+};
+import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../../lib/urls';
+---
+
+<BaseLayout seo={{
+  title: `${business.name} in ${area.name}, ${area.county || business.address.state}`,
+  description: `${business.name} serves ${area.name}${area.county ? ', ' + area.county : ''}. Professional, licensed service with ${area.responseTime || 'fast'} response times. Free estimates.`,
+  schema: localSchema,
+  breadcrumbs: [
+    { name: 'Service Areas', url: '/areas/' },
+    { name: area.name, url: `/areas/${area.slug}/` },
+  ],
+}}>
+
+  <!-- Area hero -->
+  <div class="area-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href={homeUrl()}>Home</a>
+        <span aria-hidden="true">/</span>
+        <a href={areasUrl()}>Service Areas</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{area.name}</span>
+      </nav>
+
+      <div class="area-hero-grid">
+        <div class="area-hero-content">
+          <p class="section-eyebrow">{area.county || 'Service Area'}</p>
+          <h1 class="area-hero-title">
+            {business.name} Serving {area.name}
+          </h1>
+          {area.description && (
+            <p class="area-hero-desc">{area.description}</p>
+          )}
+          <div class="area-hero-actions">
+            <a href={contactUrl()} class="btn btn-primary btn-lg">Get a Free Quote</a>
+            <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
+          </div>
+        </div>
+
+        <!-- Area quick facts -->
+        <aside class="area-facts-card">
+          <h2 class="area-facts-title">Area Details</h2>
+          {area.responseTime && (
+            <div class="area-fact">
+              <span class="area-fact-label">Response Time</span>
+              <span class="area-fact-value area-fact-value--highlight">{area.responseTime}</span>
+            </div>
+          )}
+          {area.county && (
+            <div class="area-fact">
+              <span class="area-fact-label">County</span>
+              <span class="area-fact-value">{area.county}</span>
+            </div>
+          )}
+          {area.population && (
+            <div class="area-fact">
+              <span class="area-fact-label">Population</span>
+              <span class="area-fact-value">{area.population.toLocaleString()}</span>
+            </div>
+          )}
+          {area.zipCodes && area.zipCodes.length > 0 && (
+            <div class="area-fact">
+              <span class="area-fact-label">ZIP Codes</span>
+              <span class="area-fact-value">{area.zipCodes.join(', ')}</span>
+            </div>
+          )}
+          <a href={contactUrl()} class="btn btn-primary" style="width:100%; justify-content:center; margin-top:var(--space-5);">
+            Schedule Service
+          </a>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services in this area -->
+  <ServiceCardsGrid
+    services={services}
+    eyebrow={`Services in ${area.name}`}
+    title={`What We Offer in ${area.name}`}
+    subtitle={`The full range of ${business.name} services, available to homes and businesses in ${area.name}.`}
+  />
+
+  <!-- Testimonials -->
+  {areaTestimonials.length > 0 && (
+    <Testimonials
+      testimonials={areaTestimonials}
+      businessName={business.name}
+      eyebrow="Local Reviews"
+      title={`What ${area.name} Customers Say`}
+    />
+  )}
+
+  <!-- FAQ -->
+  {faqs.length > 0 && (
+    <FaqAccordion
+      faqs={faqs}
+      eyebrow="FAQ"
+      title={`Common Questions from ${area.name} Customers`}
+    />
+  )}
+
+  <!-- Nearby areas -->
+  {nearbyAreas.length > 0 && (
+    <section class="section-sm nearby-section">
+      <div class="container">
+        <h2 class="nearby-title">Nearby Service Areas</h2>
+        <ul class="nearby-list" role="list">
+          {nearbyAreas.map(nearby => (
+            <li>
+              <a href={`/areas/${nearby.slug}/`} class="nearby-link">
+                {nearby.name}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <CtaBanner
+    headline={`Need Service in ${area.name}?`}
+    subheadline={`We're ${area.responseTime ? area.responseTime + ' away' : 'nearby'}. Call or request a free quote online.`}
+    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="brand"
+  />
+</BaseLayout>
+
+<style>
+  .area-hero {
+    background: var(--color-neutral-900);
+    padding: var(--space-10) 0 var(--space-12);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-neutral-500);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb a { color: var(--color-neutral-400); text-decoration: none; }
+  .breadcrumb a:hover { color: #ffffff; }
+
+  .area-hero-grid {
+    display: grid;
+    gap: var(--space-10);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .area-hero-grid { grid-template-columns: 1fr 300px; align-items: start; }
+  }
+
+  .area-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+    font-weight: 800;
+    color: #ffffff;
+    margin: var(--space-3) 0 var(--space-4);
+    line-height: 1.1;
+  }
+
+  .area-hero-desc {
+    font-size: var(--text-lg);
+    color: var(--color-neutral-300);
+    line-height: 1.7;
+    margin: 0 0 var(--space-6);
+    max-width: 560px;
+  }
+
+  .area-hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+  .area-hero-actions .btn-ghost { color: #ffffff; border-color: var(--color-neutral-500); }
+
+  .area-facts-card {
+    background: var(--color-bg);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .area-facts-title {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-5);
+  }
+
+  .area-fact {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+
+  .area-fact:last-of-type { border-bottom: none; }
+  .area-fact-label { color: var(--color-text-muted); }
+  .area-fact-value { font-weight: 600; color: var(--color-text); text-align: right; }
+  .area-fact-value--highlight { color: var(--color-brand-700); }
+
+  .nearby-section { border-top: 1px solid var(--color-border); background: var(--color-bg-subtle); }
+
+  .nearby-title {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+  }
+
+  .nearby-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .nearby-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-brand-700);
+    background: var(--color-brand-50);
+    border: 1px solid var(--color-brand-200);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .nearby-link:hover { background: var(--color-brand-100); border-color: var(--color-brand-400); }
+</style>

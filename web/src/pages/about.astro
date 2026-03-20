@@ -1,0 +1,373 @@
+---
+/**
+ * pages/about.astro — About page
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Testimonials from '../components/blocks/Testimonials.astro';
+import StatsBar from '../components/blocks/StatsBar.astro';
+import CtaBanner from '../components/blocks/CtaBanner.astro';
+import AwardsCertifications from '../components/blocks/AwardsCertifications.astro';
+import { getBusiness, getTestimonials, getTeamMembers } from '../lib/data';
+import config from '../site.config';
+
+const business     = await getBusiness();
+const testimonials = await getTestimonials(3);
+const team         = await getTeamMembers();
+
+const yearsInBusiness = business.yearEstablished
+  ? new Date().getFullYear() - business.yearEstablished
+  : null;
+
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': config.schemaType,
+  name: business.name,
+  foundingDate: business.yearEstablished ? String(business.yearEstablished) : undefined,
+  founder: business.owner ? { '@type': 'Person', name: business.owner } : undefined,
+  description: business.description,
+  telephone: business.phone,
+  url: config.siteUrl,
+};
+import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../lib/urls';
+---
+
+<BaseLayout seo={{
+  title: `About ${business.name}`,
+  description: `Learn about ${business.name} — ${business.description} Serving ${business.address.city}, ${business.address.state} since ${business.yearEstablished || 'day one'}.`,
+  schema: aboutSchema,
+  breadcrumbs: [{ name: 'About', url: '/about/' }],
+}}>
+
+  <!-- Page hero -->
+  <div class="about-hero">
+    <div class="container">
+      <div class="about-hero-content">
+        <p class="section-eyebrow">Our Story</p>
+        <h1 class="section-title">About {business.name}</h1>
+        <p class="about-hero-body">{business.description}</p>
+        <div class="about-hero-actions">
+          <a href={contactUrl()} class="btn btn-primary btn-lg">Get a Free Quote</a>
+          <a href={servicesUrl()} class="btn btn-ghost btn-lg">Our Services</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  {yearsInBusiness && (
+    <StatsBar stats={[
+      { value: `${yearsInBusiness}+`, label: 'Years in Business' },
+      { value: '1,000+', label: 'Projects Completed' },
+      { value: '5★', label: 'Average Rating' },
+      { value: '100%', label: 'Licensed & Insured' },
+    ]} />
+  )}
+
+  <!-- Owner spotlight -->
+  {business.owner && (
+    <section class="section owner-section">
+      <div class="container">
+        <div class="owner-grid">
+          <div class="owner-image-col">
+            <div class="owner-image-placeholder" aria-hidden="true">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="owner-content">
+            <p class="section-eyebrow">Meet the Owner</p>
+            <h2 class="section-title" style="font-size: var(--text-4xl);">{business.owner}</h2>
+            <p class="owner-bio">
+              {business.name} was founded with a simple belief: every customer deserves honest,
+              high-quality work at a fair price. Since {business.yearEstablished || 'our founding'},
+              we've built our reputation one project at a time — earning trust through consistent
+              results and straightforward communication.
+            </p>
+            {business.license && (
+              <div class="owner-credential">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="8" r="7"/>
+                  <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+                </svg>
+                {business.license}
+              </div>
+            )}
+            <div class="owner-credential">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Fully Licensed & Insured
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Team members -->
+  {config.features.teamMembers && team.length > 0 && (
+    <section class="section team-section">
+      <div class="container">
+        <header class="section-header" style="text-align:center; max-width:640px; margin-inline:auto; margin-bottom:var(--space-12);">
+          <p class="section-eyebrow">The Team</p>
+          <h2 class="section-title">Who You'll Work With</h2>
+        </header>
+        <ul class="team-grid" role="list">
+          {team.map(member => (
+            <li class="team-card">
+              <div class="team-card-image">
+                {member.image
+                  ? <img src={member.image} alt={member.name} loading="lazy" width="300" height="300" />
+                  : <div class="team-card-placeholder" aria-hidden="true">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </div>
+                }
+              </div>
+              <div class="team-card-body">
+                <h3 class="team-card-name">{member.name}</h3>
+                <p class="team-card-title">{member.title}</p>
+                {member.bio && <p class="team-card-bio">{member.bio}</p>}
+                {member.certifications && member.certifications.length > 0 && (
+                  <ul class="team-certs" role="list">
+                    {member.certifications.map(cert => (
+                      <li class="badge badge-brand">{cert}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Why us -->
+  <section class="section why-section">
+    <div class="container">
+      <div class="why-grid">
+        <div class="why-content">
+          <p class="section-eyebrow">Why Choose Us</p>
+          <h2 class="section-title">What Sets Us Apart</h2>
+          <ul class="why-list" role="list">
+            {[
+              { title: 'Licensed & Insured',         body: 'Every job is protected. We carry full liability and workers\' compensation insurance.' },
+              { title: 'Free, Honest Estimates',      body: 'No pressure, no hidden fees. We give you a clear price upfront.' },
+              { title: 'On-Time, Every Time',         body: 'We respect your schedule and show up when we say we will.' },
+              { title: 'Satisfaction Guaranteed',     body: 'If you\'re not happy with the work, we make it right. No questions asked.' },
+              { title: 'Local & Experienced',         body: `${yearsInBusiness ? yearsInBusiness + '+ years' : 'Years'} serving ${business.address.city} and the surrounding area.` },
+              { title: 'Clear Communication',         body: 'We keep you informed at every step and respond quickly to questions.' },
+            ].map(item => (
+              <li class="why-item">
+                <div class="why-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="why-item-title">{item.title}</h3>
+                  <p class="why-item-body">{item.body}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="why-cta-col">
+          <div class="why-cta-card">
+            <h3>Ready to Work Together?</h3>
+            <p>Contact us today for your free, no-obligation estimate.</p>
+            <a href={contactUrl()} class="btn btn-primary btn-lg" style="width:100%; justify-content:center;">Get a Free Quote</a>
+            <a href={business.phoneHref} class="btn btn-ghost" style="width:100%; justify-content:center; margin-top:var(--space-3);">
+              {business.phone}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  {testimonials.length > 0 && (
+    <Testimonials testimonials={testimonials} businessName={business.name} />
+  )}
+
+  <!-- Awards -->
+  <AwardsCertifications
+    awards={[
+      { name: 'Fully Licensed' },
+      { name: 'Fully Insured' },
+      { name: 'BBB Accredited' },
+      { name: 'Free Estimates' },
+    ]}
+  />
+
+  <CtaBanner
+    headline={`Start Your Project with ${business.name}`}
+    subheadline="Get your free estimate today. No pressure, no obligation."
+    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="brand"
+  />
+</BaseLayout>
+
+<style>
+  .about-hero {
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-20) 0 var(--space-16);
+  }
+
+  .about-hero-content { max-width: 680px; }
+
+  .about-hero-body {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: var(--space-5) 0 var(--space-8);
+  }
+
+  .about-hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+
+  /* Owner section */
+  .owner-grid {
+    display: grid;
+    gap: var(--space-12);
+    grid-template-columns: 1fr;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .owner-grid { grid-template-columns: 280px 1fr; }
+  }
+
+  .owner-image-placeholder {
+    width: 280px;
+    height: 320px;
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-neutral-300);
+    border: 1px solid var(--color-border);
+  }
+
+  .owner-bio {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: var(--space-5) 0 var(--space-4);
+  }
+
+  .owner-credential {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-brand-700);
+    margin-bottom: var(--space-2);
+  }
+
+  /* Team */
+  .team-section { background: var(--color-bg-subtle); }
+
+  .team-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-8);
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .team-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+
+  .team-card-image {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  .team-card-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  .team-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-neutral-300);
+  }
+
+  .team-card-body { padding: var(--space-5); }
+
+  .team-card-name  { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 700; margin: 0 0 var(--space-1); }
+  .team-card-title { font-size: var(--text-sm); color: var(--color-brand-600); font-weight: 600; margin: 0 0 var(--space-3); }
+  .team-card-bio   { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.6; margin: 0 0 var(--space-3); }
+
+  .team-certs { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+  /* Why section */
+  .why-grid {
+    display: grid;
+    gap: var(--space-12);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .why-grid { grid-template-columns: 1fr 320px; align-items: start; }
+  }
+
+  .why-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-8) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .why-item { display: flex; gap: var(--space-4); align-items: flex-start; }
+
+  .why-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-100);
+    color: var(--color-brand-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .why-item-title { font-weight: 700; margin: 0 0 var(--space-1); }
+  .why-item-body  { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.6; margin: 0; }
+
+  .why-cta-card {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-8));
+    text-align: center;
+  }
+
+  .why-cta-card h3 { font-family: var(--font-display); font-size: var(--text-2xl); margin: 0 0 var(--space-3); }
+  .why-cta-card p  { color: var(--color-text-muted); margin: 0 0 var(--space-6); }
+</style>

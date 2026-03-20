@@ -1,0 +1,75 @@
+---
+/**
+ * BaseLayout.astro
+ * The HTML shell for every page. Accepts SEO props and slot content.
+ */
+
+import SEO, { type SEOProps } from '../components/seo/SEO.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import StickyPhoneBar from '../components/blocks/StickyPhoneBar.astro';
+import config from '../site.config';
+import '../styles/global.css';
+
+interface Props {
+  seo: SEOProps;
+  fullWidthHero?: boolean;
+}
+
+const { seo, fullWidthHero = false } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SEO seo={seo} />
+
+    <!-- Google Tag Manager -->
+    {config.gtmId && (
+      <script define:vars={{ gtmId: config.gtmId }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer', gtmId);
+      </script>
+    )}
+
+    <!-- GA4 (only if no GTM) -->
+    {config.ga4Id && !config.gtmId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${config.ga4Id}`}></script>
+        <script define:vars={{ ga4Id: config.ga4Id }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', ga4Id);
+        </script>
+      </>
+    )}
+  </head>
+
+  <body>
+    <!-- GTM noscript -->
+    {config.gtmId && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${config.gtmId}`}
+          height="0" width="0"
+          style="display:none;visibility:hidden"
+        ></iframe>
+      </noscript>
+    )}
+
+    <Header />
+
+    <main id="main-content" class:list={[{ 'pt-[var(--header-height)]': !fullWidthHero }]}>
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Sticky phone bar — mobile only, shown on all pages -->
+    <StickyPhoneBar />
+  </body>
+</html>

@@ -1,0 +1,218 @@
+---
+/**
+ * pages/areas/index.astro — Service areas listing
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CtaBanner from '../../components/blocks/CtaBanner.astro';
+import { getBusiness, getServiceAreas, getServices } from '../../lib/data';
+
+const business = await getBusiness();
+const areas    = await getServiceAreas();
+const services = await getServices();
+
+const primary   = areas.filter(a => a.priority === 'primary');
+const secondary = areas.filter(a => a.priority === 'secondary');
+const tertiary  = areas.filter(a => a.priority === 'tertiary');
+---
+
+<BaseLayout seo={{
+  title: `Service Areas — ${business.address.city} and Surrounding Communities`,
+  description: `${business.name} serves ${business.serviceRadius || business.address.city + ' and surrounding areas'}. View all areas we cover and response times.`,
+  breadcrumbs: [{ name: 'Service Areas', url: '/areas/' }],
+}}>
+
+  <div class="page-hero">
+    <div class="container">
+      <p class="section-eyebrow">Where We Work</p>
+      <h1 class="section-title">Service Areas</h1>
+      <p class="section-subtitle">
+        {business.name} proudly serves {business.serviceRadius || `${business.address.city} and the surrounding region`}.
+      </p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      {primary.length > 0 && (
+        <div class="areas-group">
+          <h2 class="areas-group-title">Primary Service Area</h2>
+          <ul class="areas-grid" role="list">
+            {primary.map(area => (
+              <li>
+                <a href={`/areas/${area.slug}/`} class="area-card area-card--primary">
+                  <div class="area-card-body">
+                    <h3 class="area-card-name">{area.name}</h3>
+                    {area.county && <p class="area-card-county">{area.county}</p>}
+                    {area.responseTime && (
+                      <p class="area-card-response">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        {area.responseTime} response
+                      </p>
+                    )}
+                  </div>
+                  <svg class="area-card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {secondary.length > 0 && (
+        <div class="areas-group">
+          <h2 class="areas-group-title">Extended Service Area</h2>
+          <ul class="areas-grid" role="list">
+            {secondary.map(area => (
+              <li>
+                <a href={`/areas/${area.slug}/`} class="area-card">
+                  <div class="area-card-body">
+                    <h3 class="area-card-name">{area.name}</h3>
+                    {area.county && <p class="area-card-county">{area.county}</p>}
+                    {area.responseTime && (
+                      <p class="area-card-response">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        {area.responseTime} response
+                      </p>
+                    )}
+                  </div>
+                  <svg class="area-card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {tertiary.length > 0 && (
+        <div class="areas-group">
+          <h2 class="areas-group-title">Additional Coverage</h2>
+          <ul class="areas-pills" role="list">
+            {tertiary.map(area => (
+              <li>
+                <a href={`/areas/${area.slug}/`} class="area-pill">{area.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <CtaBanner
+    headline="Don't See Your Area?"
+    subheadline="Give us a call. We may still be able to serve you."
+    primaryCta={{ label: 'Contact Us', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="dark"
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-16) 0 var(--space-10);
+  }
+
+  .areas-group { margin-bottom: var(--space-12); }
+
+  .areas-group-title {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-5);
+  }
+
+  .areas-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px)  { .areas-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .areas-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .area-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .area-card:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+
+  .area-card--primary { border-left: 3px solid var(--color-brand-500); }
+
+  .area-card-name   { font-weight: 700; color: var(--color-text); margin: 0 0 var(--space-1); font-size: var(--text-base); }
+  .area-card-county { font-size: var(--text-xs); color: var(--color-text-muted); margin: 0 0 var(--space-1); }
+
+  .area-card-response {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-brand-600);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .area-card-arrow { color: var(--color-text-subtle); flex-shrink: 0; transition: transform var(--transition-fast); }
+  .area-card:hover .area-card-arrow { transform: translateX(4px); color: var(--color-brand-600); }
+
+  .areas-pills {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .area-pill {
+    display: inline-flex;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    background: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .area-pill:hover {
+    color: var(--color-brand-700);
+    background: var(--color-brand-50);
+    border-color: var(--color-brand-300);
+  }
+</style>

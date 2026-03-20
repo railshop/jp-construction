@@ -1,0 +1,221 @@
+---
+/**
+ * pages/index.astro — Homepage
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/blocks/Hero.astro';
+import TrustBar from '../components/blocks/TrustBar.astro';
+import StatsBar from '../components/blocks/StatsBar.astro';
+import ServiceCardsGrid from '../components/blocks/ServiceCardsGrid.astro';
+import ProjectGallery from '../components/blocks/ProjectGallery.astro';
+import ProcessSteps from '../components/blocks/ProcessSteps.astro';
+import Testimonials from '../components/blocks/Testimonials.astro';
+import FaqAccordion from '../components/blocks/FaqAccordion.astro';
+import CtaBanner from '../components/blocks/CtaBanner.astro';
+import GoogleMapsEmbed from '../components/blocks/GoogleMapsEmbed.astro';
+import EmergencyBanner from '../components/blocks/EmergencyBanner.astro';
+
+import {
+  getBusiness, getServices, getProjects,
+  getTestimonials, getFaqs,
+} from '../lib/data';
+import config from '../site.config';
+
+const business     = await getBusiness();
+const services     = await getServices();
+const projects     = await getProjects(6);
+const testimonials = await getTestimonials(6);
+const faqs         = await getFaqs();
+
+const yearsInBusiness = business.yearEstablished
+  ? new Date().getFullYear() - business.yearEstablished
+  : null;
+
+// LocalBusiness JSON-LD schema
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': config.schemaType,
+  name: business.name,
+  legalName: business.legalName,
+  url: config.siteUrl,
+  telephone: business.phone,
+  email: business.email,
+  description: business.description,
+  ...(business.address && {
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: business.address.street,
+      addressLocality: business.address.city,
+      addressRegion: business.address.state,
+      postalCode: business.address.zip,
+      addressCountry: 'US',
+    },
+  }),
+  ...(business.coordinates && {
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: business.coordinates.lat,
+      longitude: business.coordinates.lng,
+    },
+  }),
+  openingHoursSpecification: business.hours.map(h => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: h.days,
+    opens: '00:00',
+    closes: '23:59',
+  })),
+  ...(business.yearEstablished && { foundingDate: String(business.yearEstablished) }),
+  ...(business.logo && { logo: business.logo }),
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: `${business.name} Services`,
+    itemListElement: services.slice(0, 10).map(s => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: s.name,
+        description: s.shortDescription,
+      },
+    })),
+  },
+};
+---
+
+<BaseLayout
+  seo={{
+    title: `${business.name} — ${business.address.city}, ${business.address.state}`,
+    description: business.description,
+    schema: localBusinessSchema,
+  }}
+  fullWidthHero
+>
+  {config.features.emergencyBanner && <EmergencyBanner />}
+
+  <Hero
+    headline={`<em>${business.tagline}</em>`}
+    subheadline={business.description}
+    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    secondaryCta={{ label: 'View Our Work', href: '/projects/' }}
+    trustSignals={[
+      ...(business.license ? [business.license] : []),
+      'Fully Insured',
+      ...(yearsInBusiness ? [`${yearsInBusiness}+ Years Experience`] : []),
+      'Free Estimates',
+    ]}
+  />
+
+  <!-- Trust bar -->
+  <TrustBar>
+    <li class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Licensed & Insured
+    </li>
+    <li class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      5-Star Rated
+    </li>
+    <li class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Fast Response
+    </li>
+    <li class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      Free Estimates
+    </li>
+  </TrustBar>
+
+  <style>
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--color-text-muted);
+    }
+    .trust-item svg { color: var(--color-brand-600); }
+  </style>
+
+  <!-- Stats -->
+  {yearsInBusiness && (
+    <StatsBar stats={[
+      { value: `${yearsInBusiness}+`, label: 'Years in Business' },
+      { value: '1,000+', label: 'Projects Completed' },
+      { value: '5★', label: 'Average Rating' },
+      { value: '100%', label: 'Satisfaction Guarantee' },
+    ]} />
+  )}
+
+  <!-- Services -->
+  <ServiceCardsGrid
+    services={services}
+    eyebrow="What We Do"
+    title={`${business.address.city}'s Trusted ${config.schemaType.replace(/([A-Z])/g, ' $1').trim()} Services`}
+    subtitle={`Professional, reliable service from a team that takes pride in every job.`}
+  />
+
+  <!-- Process -->
+  <ProcessSteps
+    eyebrow="Our Approach"
+    title="How We Work"
+    steps={[
+      { title: 'Free Consultation', description: 'We listen to your needs, walk the property, and answer every question.' },
+      { title: 'Detailed Quote', description: 'You receive a clear, itemized estimate with no hidden fees.' },
+      { title: 'Expert Service', description: 'Our experienced crew arrives on time and gets the job done right.' },
+      { title: 'Quality Check', description: 'We review the work with you before we leave to ensure your satisfaction.' },
+    ]}
+  />
+
+  <!-- Projects -->
+  {config.features.projects && projects.length > 0 && (
+    <ProjectGallery
+      projects={projects}
+      eyebrow="Portfolio"
+      title="Recent Projects"
+      subtitle={`See what we've built for homeowners and businesses across ${business.serviceRadius || business.address.city}.`}
+    />
+  )}
+
+  <!-- Mid-page CTA -->
+  <CtaBanner
+    headline={`Ready to Transform Your Property?`}
+    subheadline="Join hundreds of satisfied customers across the area."
+    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="brand"
+  />
+
+  <!-- Testimonials -->
+  {testimonials.length > 0 && (
+    <Testimonials
+      testimonials={testimonials}
+      businessName={business.name}
+      eyebrow="Reviews"
+      title="What Our Customers Say"
+    />
+  )}
+
+  <!-- FAQ -->
+  {faqs.length > 0 && (
+    <FaqAccordion
+      faqs={faqs}
+      eyebrow="FAQ"
+      title="Common Questions"
+    />
+  )}
+
+  <!-- Map -->
+  <GoogleMapsEmbed />
+
+  <!-- Final CTA -->
+  <CtaBanner
+    headline="Let's Get Started"
+    subheadline={`Serving ${business.serviceRadius || business.address.city}. Get your free estimate today.`}
+    primaryCta={{ label: 'Contact Us Today', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="dark"
+  />
+</BaseLayout>

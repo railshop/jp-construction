@@ -1,0 +1,84 @@
+---
+/**
+ * RelatedServices.astro
+ * Internal linking block for related services. Great for SEO.
+ */
+
+import type { Service } from '../../lib/data';
+
+interface Props {
+  services: Service[];
+  title?: string;
+  currentSlug?: string;
+}
+
+const { services, title = 'Related Services', currentSlug } = Astro.props;
+const filtered = services.filter(s => s.slug !== currentSlug).slice(0, 6);
+---
+
+{filtered.length > 0 && (
+  <aside class="related-services section-sm">
+    <div class="container">
+      <h2 class="related-services-title">{title}</h2>
+      <ul class="related-services-list" role="list">
+        {filtered.map(service => (
+          <li>
+            <a href={`/services/${service.slug}/`} class="related-service-link">
+              <span class="related-service-name">{service.name}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </aside>
+)}
+
+<style>
+  .related-services {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+  }
+
+  .related-services-title {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+  }
+
+  .related-services-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .related-service-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-brand-700);
+    background: var(--color-brand-50);
+    border: 1px solid var(--color-brand-200);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .related-service-link:hover {
+    background: var(--color-brand-100);
+    border-color: var(--color-brand-400);
+  }
+</style>

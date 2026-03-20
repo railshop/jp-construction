@@ -1,0 +1,62 @@
+---
+/**
+ * TrustBar.astro
+ * Horizontal trust signals: years in business, reviews, licensing, insurance.
+ */
+
+interface TrustItem {
+  icon: 'shield' | 'star' | 'clock' | 'award' | 'check';
+  label: string;
+  value: string;
+}
+
+interface Props {
+  items?: TrustItem[];
+  variant?: 'light' | 'dark' | 'brand';
+}
+
+const { variant = 'light' } = Astro.props;
+
+const icons = {
+  shield: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`,
+  star:   `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`,
+  clock:  `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
+  award:  `<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>`,
+  check:  `<polyline points="20 6 9 17 4 12"/>`,
+};
+---
+
+<div class:list={['trust-bar', `trust-bar--${variant}`]}>
+  <div class="container">
+    <ul class="trust-bar-list" role="list">
+      <slot />
+    </ul>
+  </div>
+</div>
+
+<style>
+  .trust-bar {
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .trust-bar--dark {
+    background: var(--color-neutral-900);
+    border-color: var(--color-neutral-800);
+  }
+
+  .trust-bar--brand {
+    background: var(--color-brand-600);
+    border-color: var(--color-brand-700);
+  }
+
+  .trust-bar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-6) var(--space-10);
+  }
+</style>

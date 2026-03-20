@@ -1,0 +1,197 @@
+---
+/**
+ * Testimonials.astro
+ * Review cards with AggregateRating schema.
+ */
+
+import type { Testimonial } from '../../lib/data';
+import config from '../../site.config';
+
+interface Props {
+  testimonials: Testimonial[];
+  eyebrow?: string;
+  title?: string;
+  businessName: string;
+}
+
+const {
+  testimonials,
+  eyebrow = 'Reviews',
+  title = 'What Our Customers Say',
+  businessName,
+} = Astro.props;
+
+const avgRating = testimonials.length > 0
+  ? (testimonials.reduce((s, t) => s + t.rating, 0) / testimonials.length).toFixed(1)
+  : '5.0';
+
+const aggregateSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: businessName,
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: avgRating,
+    reviewCount: testimonials.length,
+    bestRating: 5,
+    worstRating: 1,
+  },
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(aggregateSchema)} />
+
+<section class="section testimonials-section">
+  <div class="container">
+    <header class="section-header" style="margin-bottom: var(--space-12);">
+      {eyebrow && <p class="section-eyebrow">{eyebrow}</p>}
+      {title   && <h2 class="section-title">{title}</h2>}
+      <div class="rating-summary">
+        <div class="rating-stars" aria-label={`${avgRating} out of 5 stars`}>
+          {[1,2,3,4,5].map(() => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          ))}
+        </div>
+        <span class="rating-text">
+          <strong>{avgRating}</strong> out of 5 &mdash; {testimonials.length} reviews
+        </span>
+      </div>
+    </header>
+
+    <ul class="testimonials-grid" role="list">
+      {testimonials.slice(0, 6).map((t, i) => (
+        <li
+          class="testimonial-card animate-fade-up"
+          style={`animation-delay: ${i * 100}ms`}
+          itemscope
+          itemtype="https://schema.org/Review"
+        >
+          <div class="testimonial-stars" aria-label={`${t.rating} stars`}>
+            {Array.from({ length: t.rating }).map(() => (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            ))}
+          </div>
+          <blockquote class="testimonial-text" itemprop="reviewBody">
+            "{t.text}"
+          </blockquote>
+          <footer class="testimonial-footer">
+            {t.avatar
+              ? <img src={t.avatar} alt={t.author} class="testimonial-avatar" width="40" height="40" loading="lazy" />
+              : <div class="testimonial-avatar testimonial-avatar--initials" aria-hidden="true">{t.author[0]}</div>
+            }
+            <div class="testimonial-meta">
+              <span class="testimonial-author" itemprop="author">{t.author}</span>
+              {t.location && <span class="testimonial-location">{t.location}</span>}
+            </div>
+          </footer>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .testimonials-section { background: var(--color-bg-subtle); }
+
+  .section-header { text-align: center; max-width: 640px; margin-inline: auto; }
+
+  .rating-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .rating-stars {
+    display: flex;
+    color: var(--color-accent-500);
+  }
+
+  .rating-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .testimonials-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) { .testimonials-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .testimonials-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .testimonial-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    opacity: 0;
+    animation-fill-mode: forwards;
+  }
+
+  .testimonial-stars { display: flex; color: var(--color-accent-500); }
+
+  .testimonial-text {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: 0;
+    flex: 1;
+    font-style: italic;
+  }
+
+  .testimonial-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .testimonial-avatar--initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-brand-100);
+    color: var(--color-brand-700);
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+
+  .testimonial-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .testimonial-author {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .testimonial-location {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+  }
+</style>

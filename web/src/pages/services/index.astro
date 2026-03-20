@@ -1,0 +1,53 @@
+---
+/**
+ * pages/services/index.astro — Services listing page
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServiceCardsGrid from '../../components/blocks/ServiceCardsGrid.astro';
+import CtaBanner from '../../components/blocks/CtaBanner.astro';
+import { getBusiness, getServices } from '../../lib/data';
+
+const business = await getBusiness();
+const services = await getServices();
+---
+
+<BaseLayout seo={{
+  title: `Our Services`,
+  description: `Explore all ${business.name} services. Professional, licensed, and insured in ${business.address.city}, ${business.address.state}.`,
+  breadcrumbs: [{ name: 'Services', url: '/services/' }],
+}}>
+  <div class="page-hero">
+    <div class="container">
+      <p class="section-eyebrow">What We Do</p>
+      <h1 class="section-title">Our Services</h1>
+      <p class="section-subtitle">
+        From routine maintenance to complete transformations — we handle every job with professionalism and care.
+      </p>
+    </div>
+  </div>
+
+  <ServiceCardsGrid
+    services={services}
+    columns={3}
+    showPricing={true}
+  />
+
+  <CtaBanner
+    headline="Not Sure Which Service You Need?"
+    subheadline="Give us a call or send a message. We'll help you figure out the right solution."
+    primaryCta={{ label: 'Contact Us', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-16) 0 var(--space-10);
+  }
+
+  .page-hero .section-subtitle { margin-top: var(--space-3); }
+</style>

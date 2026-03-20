@@ -1,0 +1,19 @@
+{
+  "name": "railshop-starter-service",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Railshop starter repo for local service business websites. Astro 5 + Sanity + Netlify.",
+  "scripts": {
+    "dev": "npm run dev --workspace=web",
+    "dev:studio": "npm run dev --workspace=studio",
+    "build": "npm run build --workspace=web",
+    "verify": "node scripts/verify-build.mjs",
+    "build:verify": "npm run build && npm run verify",
+    "build:studio": "npm run build --workspace=studio",
+    "preview": "npm run preview --workspace=web"
+  },
+  "workspaces": [
+    "web",
+    "studio"
+  ]
+}

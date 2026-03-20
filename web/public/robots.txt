@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Block landing pages from indexing
+Disallow: /lp/
+
+# Sitemap location — update SITE_URL before deploy
+Sitemap: https://example.com/sitemap-index.xml

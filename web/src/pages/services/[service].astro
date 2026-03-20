@@ -1,0 +1,292 @@
+---
+/**
+ * pages/services/[service].astro — Individual service page
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProcessSteps from '../../components/blocks/ProcessSteps.astro';
+import Testimonials from '../../components/blocks/Testimonials.astro';
+import FaqAccordion from '../../components/blocks/FaqAccordion.astro';
+import RelatedServices from '../../components/blocks/RelatedServices.astro';
+import SeoServiceAreas from '../../components/seo/SeoServiceAreas.astro';
+import CtaBanner from '../../components/blocks/CtaBanner.astro';
+import { getBusiness, getServices, getTestimonials, getFaqs } from '../../lib/data';
+import config from '../../site.config';
+
+export async function getStaticPaths() {
+  const services = await getServices();
+  return services.map(s => ({ params: { service: s.slug } }));
+}
+
+const { service: serviceSlug } = Astro.params;
+const business     = await getBusiness();
+const services     = await getServices();
+const service      = services.find(s => s.slug === serviceSlug)!;
+const testimonials = await getTestimonials();
+const faqs         = await getFaqs();
+
+const serviceTestimonials = testimonials.filter(t =>
+  !t.service || t.service === serviceSlug
+).slice(0, 3);
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.name,
+  description: service.description,
+  provider: {
+    '@type': config.schemaType,
+    name: business.name,
+    telephone: business.phone,
+    url: config.siteUrl,
+  },
+  areaServed: {
+    '@type': 'City',
+    name: business.address.city,
+  },
+  ...(service.priceRange && {
+    offers: {
+      '@type': 'Offer',
+      priceRange: `$${service.priceRange.min} - $${service.priceRange.max}`,
+      priceCurrency: 'USD',
+    },
+  }),
+};
+import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../../lib/urls';
+---
+
+<BaseLayout seo={{
+  title: `${service.name} in ${business.address.city}, ${business.address.state}`,
+  description: `${service.shortDescription} Serving ${business.address.city} and surrounding areas. Licensed, insured, free estimates.`,
+  ogType: 'website',
+  schema: serviceSchema,
+  breadcrumbs: [
+    { name: 'Services', url: '/services/' },
+    { name: service.name, url: `/services/${service.slug}/` },
+  ],
+}}>
+
+  <!-- Service hero -->
+  <div class="service-hero">
+    {service.image && (
+      <div class="service-hero-image" aria-hidden="true">
+        <img src={service.image} alt={service.name} width="1280" height="480" />
+        <div class="service-hero-overlay"></div>
+      </div>
+    )}
+    <div class="container service-hero-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href={homeUrl()}>Home</a>
+        <span aria-hidden="true">/</span>
+        <a href={servicesUrl()}>Services</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{service.name}</span>
+      </nav>
+      <div class="service-hero-body">
+        <div class="service-hero-text">
+          {service.emergency && (
+            <span class="badge badge-accent" style="margin-bottom:var(--space-3)">24/7 Emergency Service</span>
+          )}
+          <h1 class="service-hero-title">
+            {service.name} in {business.address.city}
+          </h1>
+          <p class="service-hero-desc">{service.description}</p>
+          <div class="service-hero-actions">
+            <a href={contactUrl()} class="btn btn-primary btn-lg">Get a Free Quote</a>
+            <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
+          </div>
+        </div>
+
+        <!-- Quick facts sidebar -->
+        <aside class="service-sidebar">
+          <div class="service-sidebar-card">
+            <h2 class="service-sidebar-title">Quick Facts</h2>
+            {service.priceRange && (
+              <div class="service-fact">
+                <span class="service-fact-label">Typical Range</span>
+                <span class="service-fact-value">${service.priceRange.min.toLocaleString()} – ${service.priceRange.max.toLocaleString()}</span>
+              </div>
+            )}
+            <div class="service-fact">
+              <span class="service-fact-label">Availability</span>
+              <span class="service-fact-value">{service.emergency ? '24/7 Emergency' : 'By Appointment'}</span>
+            </div>
+            <div class="service-fact">
+              <span class="service-fact-label">License</span>
+              <span class="service-fact-value">{business.license || 'Fully Licensed'}</span>
+            </div>
+            <div class="service-fact">
+              <span class="service-fact-label">Estimate</span>
+              <span class="service-fact-value">Free, No Obligation</span>
+            </div>
+            <a href={contactUrl()} class="btn btn-primary" style="width:100%; justify-content:center; margin-top:var(--space-4)">
+              Schedule Service
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- Process steps -->
+  {service.processSteps?.length > 0 && (
+    <ProcessSteps
+      steps={service.processSteps}
+      eyebrow="Our Process"
+      title={`How We Handle ${service.name}`}
+    />
+  )}
+
+  <!-- Testimonials -->
+  {serviceTestimonials.length > 0 && (
+    <Testimonials
+      testimonials={serviceTestimonials}
+      businessName={business.name}
+      eyebrow="Reviews"
+      title={`What Customers Say About Our ${service.name}`}
+    />
+  )}
+
+  <!-- FAQ -->
+  {faqs.length > 0 && (
+    <FaqAccordion
+      faqs={faqs}
+      eyebrow="FAQ"
+      title={`${service.name} Questions Answered`}
+    />
+  )}
+
+  <!-- All areas for this service -->
+  <SeoServiceAreas
+    service={service}
+    areas={await (async () => { const { getServiceAreas } = await import('../../lib/data'); return getServiceAreas(); })()}
+    title={`${service.name} — Areas We Serve`}
+  />
+
+  <!-- Related services -->
+  <RelatedServices services={services} currentSlug={service.slug} />
+
+  <!-- CTA -->
+  <CtaBanner
+    headline={`Need ${service.name} in ${business.address.city}?`}
+    subheadline={`Call us or request a free quote online. We respond quickly.`}
+    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="brand"
+  />
+</BaseLayout>
+
+<style>
+  .service-hero {
+    position: relative;
+    background: var(--color-neutral-900);
+    padding-top: var(--space-10);
+    padding-bottom: var(--space-12);
+  }
+
+  .service-hero-image {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .service-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .service-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-neutral-950) 85%, transparent),
+      color-mix(in srgb, var(--color-neutral-950) 50%, transparent)
+    );
+  }
+
+  .service-hero-content { position: relative; z-index: 1; }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-neutral-400);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb a { color: var(--color-neutral-400); text-decoration: none; }
+  .breadcrumb a:hover { color: #ffffff; }
+
+  .service-hero-body {
+    display: grid;
+    gap: var(--space-10);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .service-hero-body { grid-template-columns: 1fr 320px; align-items: start; }
+  }
+
+  .service-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+    font-weight: 800;
+    color: #ffffff;
+    margin: var(--space-3) 0 var(--space-4);
+    line-height: 1.1;
+  }
+
+  .service-hero-desc {
+    font-size: var(--text-lg);
+    color: var(--color-neutral-300);
+    line-height: 1.7;
+    margin: 0 0 var(--space-6);
+    max-width: 560px;
+  }
+
+  .service-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .service-hero-actions .btn-ghost {
+    color: #ffffff;
+    border-color: var(--color-neutral-500);
+  }
+
+  .service-sidebar-card {
+    background: var(--color-bg);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .service-sidebar-title {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-5);
+  }
+
+  .service-fact {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+
+  .service-fact:last-of-type { border-bottom: none; }
+
+  .service-fact-label { color: var(--color-text-muted); }
+  .service-fact-value { font-weight: 600; color: var(--color-text); text-align: right; }
+</style>

@@ -1,0 +1,155 @@
+---
+/**
+ * ProcessSteps.astro
+ * Numbered step-by-step section explaining how the service works.
+ */
+
+interface Step {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  steps: Step[];
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  variant?: 'light' | 'dark';
+}
+
+const {
+  steps,
+  eyebrow = 'How It Works',
+  title = 'Our Process',
+  subtitle,
+  variant = 'light',
+} = Astro.props;
+---
+
+<section class:list={['section process-section', `process-section--${variant}`]}>
+  <div class="container">
+    <header class="section-header" style="text-align:center; max-width:640px; margin-inline:auto; margin-bottom:var(--space-12);">
+      {eyebrow && <p class="section-eyebrow">{eyebrow}</p>}
+      {title   && <h2 class="section-title">{title}</h2>}
+      {subtitle && <p class="section-subtitle" style="margin-inline:auto;">{subtitle}</p>}
+    </header>
+
+    <ol class="process-list" role="list">
+      {steps.map((step, i) => (
+        <li class="process-step animate-fade-up" style={`animation-delay:${i * 120}ms`}>
+          <div class="process-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</div>
+          <div class="process-connector" aria-hidden="true"></div>
+          <div class="process-content">
+            <h3 class="process-title">{step.title}</h3>
+            <p class="process-desc">{step.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process-section--dark {
+    background: var(--color-neutral-950);
+  }
+
+  .process-section--dark .section-title,
+  .process-section--dark .process-title {
+    color: #ffffff;
+  }
+
+  .process-section--dark .section-eyebrow {
+    color: var(--color-brand-400);
+  }
+
+  .process-section--dark .section-subtitle,
+  .process-section--dark .process-desc {
+    color: var(--color-neutral-400);
+  }
+
+  .process-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-8);
+    grid-template-columns: 1fr;
+    counter-reset: steps;
+  }
+
+  @media (min-width: 640px) {
+    .process-list { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .process-list { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .process-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    opacity: 0;
+    animation-fill-mode: forwards;
+  }
+
+  .process-number {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-brand-100);
+    transition: color var(--transition-base);
+  }
+
+  .process-section--dark .process-number {
+    color: var(--color-brand-900);
+  }
+
+  .process-step:hover .process-number {
+    color: var(--color-brand-200);
+  }
+
+  .process-connector {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .process-connector {
+      display: block;
+      position: absolute;
+      top: 28px;
+      left: calc(100% + var(--space-4));
+      width: calc(100% - var(--space-8));
+      height: 2px;
+      background: var(--color-border);
+    }
+
+    .process-step:last-child .process-connector {
+      display: none;
+    }
+  }
+
+  .process-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .process-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .process-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+/**
+ * pages/projects/index.astro — Projects showcase listing
+ */
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectGallery from '../../components/blocks/ProjectGallery.astro';
+import CtaBanner from '../../components/blocks/CtaBanner.astro';
+import { getBusiness, getProjects } from '../../lib/data';
+
+const business = await getBusiness();
+const projects = await getProjects();
+---
+
+<BaseLayout seo={{
+  title: `Our Work — Projects & Portfolio`,
+  description: `Browse completed projects by ${business.name}. Real work, real results for homeowners and businesses in ${business.address.city} and surrounding areas.`,
+  breadcrumbs: [{ name: 'Projects', url: '/projects/' }],
+}}>
+
+  <div class="page-hero">
+    <div class="container">
+      <p class="section-eyebrow">Portfolio</p>
+      <h1 class="section-title">Our Work</h1>
+      <p class="section-subtitle">
+        Every project is a reflection of our commitment to quality. Browse our completed work below.
+      </p>
+    </div>
+  </div>
+
+  {projects.length === 0
+    ? (
+      <section class="section">
+        <div class="container" style="text-align:center; color:var(--color-text-muted); padding-block:var(--space-20);">
+          <p>Projects coming soon. Check back shortly.</p>
+        </div>
+      </section>
+    )
+    : (
+      <ProjectGallery
+        projects={projects}
+        showFilter={true}
+        columns={3}
+      />
+    )
+  }
+
+  <CtaBanner
+    headline="Like What You See?"
+    subheadline="Get in touch for a free estimate on your project."
+    primaryCta={{ label: 'Start Your Project', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="brand"
+  />
+</BaseLayout>
+
+<style>
+  .page-hero { background: var(--color-bg-subtle); border-bottom: 1px solid var(--color-border); padding: var(--space-16) 0 var(--space-10); }
+</style>

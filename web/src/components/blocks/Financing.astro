@@ -1,0 +1,135 @@
+---
+/**
+ * Financing.astro
+ * Payment options / financing section. Toggle via site.config features.financing.
+ */
+
+interface Props {
+  headline?: string;
+  body?: string;
+  options?: string[];
+  ctaLabel?: string;
+  ctaHref?: string;
+  logo?: string;
+}
+
+const {
+  headline = 'Flexible Financing Available',
+  body = 'We understand that home improvement projects are a significant investment. That\'s why we offer flexible payment options to fit your budget.',
+  options = [
+    '0% interest for 12 months',
+    'Low monthly payment plans',
+    'Fast, easy approval process',
+    'No prepayment penalties',
+  ],
+  ctaLabel = 'Apply for Financing',
+  ctaHref = '/contact/',
+  logo,
+} = Astro.props;
+---
+
+<section class="section-sm financing-section">
+  <div class="container">
+    <div class="financing-card">
+      <div class="financing-content">
+        {logo && <img src={logo} alt="Financing partner" class="financing-logo" loading="lazy" />}
+        <h2 class="financing-headline">{headline}</h2>
+        <p class="financing-body">{body}</p>
+        <ul class="financing-options" role="list">
+          {options.map(opt => (
+            <li class="financing-option">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              {opt}
+            </li>
+          ))}
+        </ul>
+        <a href={ctaHref} class="btn btn-primary">{ctaLabel}</a>
+      </div>
+      <div class="financing-visual" aria-hidden="true">
+        <div class="financing-icon-bg">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .financing-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    background: linear-gradient(135deg, var(--color-brand-50), var(--color-brand-100));
+    border: 1px solid var(--color-brand-200);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-10);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .financing-card { grid-template-columns: 1fr auto; align-items: center; }
+  }
+
+  .financing-logo {
+    max-height: 40px;
+    width: auto;
+    margin-bottom: var(--space-4);
+  }
+
+  .financing-headline {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
+    font-weight: 700;
+    color: var(--color-brand-900);
+    margin: 0 0 var(--space-3);
+  }
+
+  .financing-body {
+    font-size: var(--text-base);
+    color: var(--color-brand-800);
+    line-height: 1.7;
+    margin: 0 0 var(--space-5);
+  }
+
+  .financing-options {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .financing-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-brand-800);
+  }
+
+  .financing-option svg { color: var(--color-brand-600); flex-shrink: 0; }
+
+  .financing-visual { display: none; }
+
+  @media (min-width: 768px) {
+    .financing-visual { display: flex; justify-content: center; }
+  }
+
+  .financing-icon-bg {
+    width: 160px;
+    height: 160px;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-brand-400);
+  }
+</style>

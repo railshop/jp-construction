@@ -1,0 +1,331 @@
+---
+/**
+ * pages/lp/[campaign].astro — Campaign landing page template
+ *
+ * Usage: Duplicate and customize per campaign.
+ * These pages strip the main nav for focused conversion.
+ * Accessible at /lp/[campaign-slug]/
+ *
+ * Example campaigns:
+ *   /lp/spring-landscaping/
+ *   /lp/outdoor-lighting-special/
+ *   /lp/hvac-tune-up/
+ */
+
+import SEO from '../../components/seo/SEO.astro';
+import CtaBanner from '../../components/blocks/CtaBanner.astro';
+import FaqAccordion from '../../components/blocks/FaqAccordion.astro';
+import Testimonials from '../../components/blocks/Testimonials.astro';
+import { getBusiness, getTestimonials, getFaqs } from '../../lib/data';
+import config from '../../site.config';
+import '../../styles/global.css';
+
+/**
+ * To add a new campaign:
+ * 1. Add an entry to the campaigns object below
+ * 2. Deploy — the page will be live at /lp/[slug]/
+ */
+
+interface Campaign {
+  slug: string;
+  title: string;
+  headline: string;
+  subheadline: string;
+  metaDescription: string;
+  offer?: string;
+  features: string[];
+  formTitle?: string;
+}
+
+const campaigns: Campaign[] = [
+  {
+    slug: 'spring-special',
+    title: 'Spring Service Special',
+    headline: 'Get Your Property Spring-Ready',
+    subheadline: 'Limited-time offer. Schedule your spring service and save.',
+    metaDescription: 'Spring landscaping and outdoor service special. Schedule now for priority booking.',
+    offer: '$50 off your first service',
+    features: [
+      'Free property assessment',
+      'Priority scheduling',
+      'Licensed & insured crew',
+      'Satisfaction guaranteed',
+    ],
+    formTitle: 'Claim Your Spring Special',
+  },
+];
+
+export function getStaticPaths() {
+  return campaigns.map(c => ({ params: { campaign: c.slug } }));
+}
+
+const { campaign: campaignSlug } = Astro.params;
+const campaign   = campaigns.find(c => c.slug === campaignSlug)!;
+const business   = await getBusiness();
+const testimonials = (await getTestimonials(3));
+const faqs       = (await getFaqs()).slice(0, 4);
+import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../../lib/urls';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SEO seo={{
+      title: campaign.title,
+      description: campaign.metaDescription,
+      noindex: true, // Landing pages typically excluded from search indexing
+    }} />
+  </head>
+
+  <body class="lp-body">
+
+    <!-- Minimal header — logo + phone only, no nav -->
+    <header class="lp-header">
+      <div class="container">
+        <div class="lp-header-inner">
+          <a href={homeUrl()} class="header-logo" aria-label={`${business.name} — Home`}>
+            <span class="logo-primary">{business.name.split(' ').slice(0, -1).join(' ')}</span>
+            <span class="logo-accent">{business.name.split(' ').slice(-1)}</span>
+          </a>
+          <a href={business.phoneHref} class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.77 3.44 2 2 0 0 1 3.74 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            {business.phone}
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero + Form -->
+      <section class="lp-hero">
+        <div class="container">
+          <div class="lp-hero-grid">
+            <div class="lp-hero-content">
+              {campaign.offer && (
+                <div class="lp-offer-badge">
+                  <span class="badge badge-accent">{campaign.offer}</span>
+                </div>
+              )}
+              <h1 class="lp-headline">{campaign.headline}</h1>
+              <p class="lp-subheadline">{campaign.subheadline}</p>
+              <ul class="lp-features" role="list">
+                {campaign.features.map(f => (
+                  <li class="lp-feature">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <!-- Lead capture form -->
+            <div class="lp-form-col">
+              <div class="lp-form-card">
+                <h2 class="lp-form-title">{campaign.formTitle || 'Get Your Free Quote'}</h2>
+                <form
+                  name={`lp-${campaignSlug}`}
+                  method="POST"
+                  data-netlify="true"
+                  netlify-honeypot="bot-field"
+                  class="lp-form"
+                >
+                  <input type="hidden" name="form-name" value={`lp-${campaignSlug}`} />
+                  <input type="hidden" name="campaign" value={campaignSlug} />
+                  <p class="hidden" aria-hidden="true"><label>Don't fill this: <input name="bot-field" /></label></p>
+
+                  <div class="form-group">
+                    <label class="form-label" for="lp-name">Your Name <span aria-label="required">*</span></label>
+                    <input class="form-input" type="text" id="lp-name" name="name" required autocomplete="name" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="lp-phone">Phone Number <span aria-label="required">*</span></label>
+                    <input class="form-input" type="tel" id="lp-phone" name="phone" required autocomplete="tel" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="lp-email">Email</label>
+                    <input class="form-input" type="email" id="lp-email" name="email" autocomplete="email" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="lp-message">Tell Us About Your Project</label>
+                    <textarea class="form-textarea" id="lp-message" name="message" rows="3"></textarea>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-lg" style="width:100%; justify-content:center;">
+                    Request My Free Quote
+                  </button>
+
+                  <p class="lp-form-disclaimer">
+                    No obligation. We'll respond within one business day.
+                  </p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      {testimonials.length > 0 && (
+        <Testimonials testimonials={testimonials} businessName={business.name} />
+      )}
+
+      <!-- FAQ -->
+      {faqs.length > 0 && (
+        <FaqAccordion faqs={faqs} />
+      )}
+
+      <!-- Final CTA -->
+      <CtaBanner
+        headline="Don't Miss Out"
+        subheadline="This offer is for a limited time. Secure your spot now."
+        primaryCta={{ label: 'Get My Free Quote', href: '#lp-form' }}
+        phone={business.phone}
+        phoneHref={business.phoneHref}
+        variant="brand"
+      />
+    </main>
+
+    <!-- Minimal footer -->
+    <footer class="lp-footer">
+      <div class="container">
+        <p>&copy; {new Date().getFullYear()} {business.legalName || business.name}. All rights reserved.</p>
+        <nav aria-label="Footer links">
+          <a href={homeUrl()}>Home</a>
+          <a href={contactUrl()}>Contact</a>
+          <a href={servicesUrl()}>Services</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .lp-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--header-height);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .lp-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+  }
+
+  .lp-hero {
+    background: var(--color-neutral-900);
+    padding: var(--space-16) 0;
+    min-height: min(600px, 80vh);
+    display: flex;
+    align-items: center;
+  }
+
+  .lp-hero-grid {
+    display: grid;
+    gap: var(--space-12);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    .lp-hero-grid { grid-template-columns: 1fr 420px; align-items: center; }
+  }
+
+  .lp-offer-badge { margin-bottom: var(--space-4); }
+
+  .lp-headline {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-3xl), 5vw, var(--text-6xl));
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.05;
+    margin: 0 0 var(--space-4);
+  }
+
+  .lp-subheadline {
+    font-size: var(--text-xl);
+    color: var(--color-neutral-300);
+    line-height: 1.6;
+    margin: 0 0 var(--space-8);
+  }
+
+  .lp-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .lp-feature {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-neutral-200);
+  }
+
+  .lp-feature svg { color: var(--color-accent-400); flex-shrink: 0; }
+
+  .lp-form-card {
+    background: var(--color-bg);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .lp-form-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 0 0 var(--space-6);
+    text-align: center;
+  }
+
+  .lp-form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+  .lp-form-disclaimer {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    text-align: center;
+    margin: 0;
+  }
+
+  .hidden { display: none; }
+
+  .lp-footer {
+    background: var(--color-neutral-950);
+    padding: var(--space-6) 0;
+    color: var(--color-neutral-500);
+  }
+
+  .lp-footer .container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: center;
+    text-align: center;
+    font-size: var(--text-xs);
+  }
+
+  @media (min-width: 640px) {
+    .lp-footer .container { flex-direction: row; justify-content: space-between; text-align: left; }
+  }
+
+  .lp-footer nav { display: flex; gap: var(--space-4); }
+  .lp-footer a { color: var(--color-neutral-600); text-decoration: none; }
+  .lp-footer a:hover { color: var(--color-neutral-400); }
+</style>
