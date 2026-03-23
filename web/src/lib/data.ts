@@ -360,8 +360,8 @@ export function generateComboContent(
     subheadline: `Professional ${service.name.toLowerCase()} in ${area.name}, ${business.address.state}. Licensed, insured, and locally based — free estimates on every project.`,
 
     heroDescription: years
-      ? `${business.name} has delivered ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle} for ${years}+ years. Jake Petro manages every project personally — on-site, on schedule, and built to the standard your property deserves.`
-      : `${business.name} delivers ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle}. Jake Petro manages every project personally — on-site, on schedule, and built to the standard your property deserves.`,
+      ? `${business.name} has delivered ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle} for ${years}+ years. Every project is managed start to finish — on-site, on schedule, and built to the standard your property deserves.`
+      : `${business.name} delivers ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle}. Every project is managed start to finish — on-site, on schedule, and built to the standard your property deserves.`,
 
     localAngle: ctx?.commonChallenges?.length
       ? `We've completed projects throughout ${area.name} and know the conditions that affect ${service.name.toLowerCase()} quality here firsthand — from ${ctx.commonChallenges[0].toLowerCase().split(' ').slice(0, 6).join(' ')} to permit timelines with ${area.county || 'local'} offices. That knowledge shapes every decision we make on your project.`
