@@ -6,10 +6,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/blocks/Hero.astro';
 import TrustBar from '../components/blocks/TrustBar.astro';
-import StatsBar from '../components/blocks/StatsBar.astro';
 import ServiceCardsGrid from '../components/blocks/ServiceCardsGrid.astro';
-import ProjectGallery from '../components/blocks/ProjectGallery.astro';
-import ProcessSteps from '../components/blocks/ProcessSteps.astro';
+import FeaturedProjects from '../components/blocks/FeaturedProjects.astro';
 import Testimonials from '../components/blocks/Testimonials.astro';
 import FaqAccordion from '../components/blocks/FaqAccordion.astro';
 import CtaBanner from '../components/blocks/CtaBanner.astro';
@@ -18,17 +16,18 @@ import EmergencyBanner from '../components/blocks/EmergencyBanner.astro';
 
 import {
   getBusiness, getServices, getProjects,
-  getTestimonials, getFaqs,
+  getTestimonials, getFaqs, getServiceAreas,
 } from '../lib/data';
-import config from '../site.config';
+import config from '@/site.config';
 
 const business     = await getBusiness();
 const services     = await getServices();
 const projects     = await getProjects(6);
-const testimonials = await getTestimonials(6);
+const testimonials = await getTestimonials(3);
 const faqs         = await getFaqs();
+const serviceAreas = await getServiceAreas();
 
-const yearsInBusiness = business.yearEstablished
+const _yearsInBusiness = business.yearEstablished
   ? new Date().getFullYear() - business.yearEstablished
   : null;
 
@@ -67,6 +66,16 @@ const localBusinessSchema = {
   })),
   ...(business.yearEstablished && { foundingDate: String(business.yearEstablished) }),
   ...(business.logo && { logo: business.logo }),
+  ...(serviceAreas.length > 0 && {
+    areaServed: serviceAreas.map(a => ({
+      '@type': 'City',
+      name: a.name,
+      containedInPlace: { '@type': 'State', name: 'Pennsylvania' },
+    })),
+  }),
+  ...(business.coordinates && {
+    hasMap: `https://maps.google.com/maps?q=${business.coordinates.lat},${business.coordinates.lng}`,
+  }),
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: `${business.name} Services`,
@@ -93,37 +102,16 @@ const localBusinessSchema = {
   {config.features.emergencyBanner && <EmergencyBanner />}
 
   <Hero
-    headline={`<em>${business.tagline}</em>`}
+    headline={`<em>Built Right.<br>Built to Last.</em>`}
     subheadline={business.description}
-    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     secondaryCta={{ label: 'View Our Work', href: '/projects/' }}
-    trustSignals={[
-      ...(business.license ? [business.license] : []),
-      'Fully Insured',
-      ...(yearsInBusiness ? [`${yearsInBusiness}+ Years Experience`] : []),
-      'Free Estimates',
-    ]}
+    backgroundImage="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1800&q=85&auto=format&fit=crop"
+    googleReviews={{ rating: 4.9 }}
+    bbbAccredited={{}}
+    jpOpsCredit={true}
   />
 
-  <!-- Trust bar -->
-  <TrustBar>
-    <li class="trust-item">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Licensed & Insured
-    </li>
-    <li class="trust-item">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      5-Star Rated
-    </li>
-    <li class="trust-item">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Fast Response
-    </li>
-    <li class="trust-item">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-      Free Estimates
-    </li>
-  </TrustBar>
 
   <style>
     .trust-item {
@@ -131,21 +119,12 @@ const localBusinessSchema = {
       align-items: center;
       gap: 0.5rem;
       font-size: var(--text-sm);
-      font-weight: 500;
+      font-weight: 600;
       color: var(--color-text-muted);
+      letter-spacing: 0.01em;
     }
-    .trust-item svg { color: var(--color-brand-600); }
+    .trust-item svg { color: var(--color-accent-500); flex-shrink: 0; }
   </style>
-
-  <!-- Stats -->
-  {yearsInBusiness && (
-    <StatsBar stats={[
-      { value: `${yearsInBusiness}+`, label: 'Years in Business' },
-      { value: '1,000+', label: 'Projects Completed' },
-      { value: '5★', label: 'Average Rating' },
-      { value: '100%', label: 'Satisfaction Guarantee' },
-    ]} />
-  )}
 
   <!-- Services -->
   <ServiceCardsGrid
@@ -155,37 +134,15 @@ const localBusinessSchema = {
     subtitle={`Professional, reliable service from a team that takes pride in every job.`}
   />
 
-  <!-- Process -->
-  <ProcessSteps
-    eyebrow="Our Approach"
-    title="How We Work"
-    steps={[
-      { title: 'Free Consultation', description: 'We listen to your needs, walk the property, and answer every question.' },
-      { title: 'Detailed Quote', description: 'You receive a clear, itemized estimate with no hidden fees.' },
-      { title: 'Expert Service', description: 'Our experienced crew arrives on time and gets the job done right.' },
-      { title: 'Quality Check', description: 'We review the work with you before we leave to ensure your satisfaction.' },
-    ]}
-  />
-
-  <!-- Projects -->
+  <!-- Featured Projects -->
   {config.features.projects && projects.length > 0 && (
-    <ProjectGallery
+    <FeaturedProjects
       projects={projects}
-      eyebrow="Portfolio"
-      title="Recent Projects"
-      subtitle={`See what we've built for homeowners and businesses across ${business.serviceRadius || business.address.city}.`}
+      eyebrow="Our Work"
+      title="Built to Show For"
+      subtitle={`Real projects, real results — across Westmoreland County and beyond.`}
     />
   )}
-
-  <!-- Mid-page CTA -->
-  <CtaBanner
-    headline={`Ready to Transform Your Property?`}
-    subheadline="Join hundreds of satisfied customers across the area."
-    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
-    phone={business.phone}
-    phoneHref={business.phoneHref}
-    variant="brand"
-  />
 
   <!-- Testimonials -->
   {testimonials.length > 0 && (
@@ -207,7 +164,7 @@ const localBusinessSchema = {
   )}
 
   <!-- Map -->
-  <GoogleMapsEmbed />
+  <GoogleMapsEmbed serviceAreas={serviceAreas} />
 
   <!-- Final CTA -->
   <CtaBanner

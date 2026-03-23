@@ -85,27 +85,27 @@ export interface SiteConfig {
 // Edit these values for each new client project.
 
 const config: SiteConfig = {
-  clientName: 'Acme Services',
-  clientSlug: 'acme-services',
+  clientName: 'JP Construction',
+  clientSlug: 'jp-construction',
 
-  industry: 'landscaping',
-  schemaType: 'LandscapingService',
+  industry: 'general-contractor',
+  schemaType: 'GeneralContractor',
 
-  cmsMode: 'sanity', // 'sanity' | 'local'
+  cmsMode: 'local', // 'sanity' | 'local'
 
-  siteUrl: 'https://example.com',
-  siteName: 'Acme Services',
-  siteDescription: 'Professional landscaping and outdoor services in the greater Pittsburgh area.',
+  siteUrl: 'https://buildwithjp.com',
+  siteName: 'JP Construction',
+  siteDescription: 'Custom home building, additions, and general contracting in North Huntingdon and Westmoreland County, PA.',
 
   features: {
-    blog: true,
+    blog: false,
     projects: true,
     serviceAreas: true,
-    teamMembers: false,
+    teamMembers: true,
     emergencyBanner: false,
     beforeAfterSlider: true,
     financing: false,
-    campaignLandingPages: true,
+    campaignLandingPages: false,
   },
 
   ga4Id: undefined,

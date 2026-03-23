@@ -5,7 +5,7 @@
  */
 
 import type { FaqItem } from '../../lib/data';
-import config from '../../site.config';
+import config from '@/site.config';
 
 interface Props {
   faqs: FaqItem[];
@@ -13,6 +13,7 @@ interface Props {
   title?: string;
   subtitle?: string;
   includeSchema?: boolean;
+  variant?: 'light' | 'dark';
 }
 
 const {
@@ -21,6 +22,7 @@ const {
   title = 'Frequently Asked Questions',
   subtitle,
   includeSchema = true,
+  variant = 'light',
 } = Astro.props;
 
 const faqSchema = includeSchema && faqs.length > 0
@@ -43,7 +45,7 @@ const faqSchema = includeSchema && faqs.length > 0
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 )}
 
-<section class="section faq-section">
+<section class:list={['section faq-section', `faq-section--${variant}`]}>
   <div class="container">
     <div class="faq-layout">
       <header class="faq-header">
@@ -88,6 +90,60 @@ const faqSchema = includeSchema && faqs.length > 0
 </section>
 
 <style>
+  /* ─── Dark variant ───────────────────────────────────────────────────────── */
+
+  .faq-section--dark {
+    background: var(--color-brand-950);
+  }
+
+  .faq-section--dark .section-eyebrow {
+    color: var(--color-accent-500);
+  }
+
+  .faq-section--dark .section-title {
+    color: #ffffff;
+  }
+
+  .faq-section--dark .section-subtitle {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .faq-section--dark .faq-list {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .faq-section--dark .faq-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .faq-section--dark .faq-question {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .faq-section--dark .faq-question:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+  }
+
+  .faq-section--dark .faq-question[aria-expanded="true"] {
+    color: var(--color-accent-400);
+    background: color-mix(in srgb, var(--color-accent-500) 10%, transparent);
+  }
+
+  .faq-section--dark .faq-icon {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .faq-section--dark .faq-question[aria-expanded="true"] .faq-icon {
+    color: var(--color-accent-400);
+  }
+
+  .faq-section--dark .faq-answer-inner p {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  /* ─── Layout ─────────────────────────────────────────────────────────────── */
+
   .faq-layout {
     display: grid;
     gap: var(--space-12);
@@ -99,9 +155,13 @@ const faqSchema = includeSchema && faqs.length > 0
       grid-template-columns: 1fr 2fr;
       align-items: start;
     }
+    .faq-header {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
   }
 
-  .faq-header { position: sticky; top: calc(var(--header-height) + var(--space-8)); }
+  /* sticky only applies on the two-column desktop layout */
 
   .faq-list {
     display: flex;
@@ -138,12 +198,12 @@ const faqSchema = includeSchema && faqs.length > 0
 
   .faq-question:hover {
     background: var(--color-bg-subtle);
-    color: var(--color-brand-700);
+    color: var(--color-text);
   }
 
   .faq-question[aria-expanded="true"] {
-    color: var(--color-brand-700);
-    background: var(--color-brand-50);
+    color: var(--color-accent-500);
+    background: color-mix(in srgb, var(--color-accent-500) 5%, transparent);
   }
 
   .faq-icon {
@@ -154,7 +214,7 @@ const faqSchema = includeSchema && faqs.length > 0
 
   .faq-question[aria-expanded="true"] .faq-icon {
     transform: rotate(180deg);
-    color: var(--color-brand-600);
+    color: var(--color-accent-500);
   }
 
   .faq-answer {

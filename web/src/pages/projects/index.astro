@@ -7,6 +7,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectGallery from '../../components/blocks/ProjectGallery.astro';
 import CtaBanner from '../../components/blocks/CtaBanner.astro';
 import { getBusiness, getProjects } from '../../lib/data';
+import { contactUrl, servicesUrl } from '../../lib/urls';
 
 const business = await getBusiness();
 const projects = await getProjects();
@@ -21,10 +22,14 @@ const projects = await getProjects();
   <div class="page-hero">
     <div class="container">
       <p class="section-eyebrow">Portfolio</p>
-      <h1 class="section-title">Our Work</h1>
+      <h1 class="section-title">Real Work.<br/>Real Results.</h1>
       <p class="section-subtitle">
-        Every project is a reflection of our commitment to quality. Browse our completed work below.
+        Every project here was managed by Jake Petro from the first site visit to final walkthrough. This is what it looks like when the owner stays on the job.
       </p>
+      <div class="hero-actions">
+        <a href={contactUrl()} class="btn btn-primary btn-lg">Start Your Project</a>
+        <a href={servicesUrl()} class="btn btn-ghost-light btn-lg">View Our Services</a>
+      </div>
     </div>
   </div>
 
@@ -40,6 +45,7 @@ const projects = await getProjects();
       <ProjectGallery
         projects={projects}
         showFilter={true}
+        showViewAll={false}
         columns={3}
       />
     )
@@ -56,5 +62,56 @@ const projects = await getProjects();
 </BaseLayout>
 
 <style>
-  .page-hero { background: var(--color-bg-subtle); border-bottom: 1px solid var(--color-border); padding: var(--space-16) 0 var(--space-10); }
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-24) 0 var(--space-20);
+    background-color: var(--color-brand-900);
+  }
+
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1600&q=80&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center 55%;
+  }
+
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to right, rgba(10,10,10,0.82) 0%, rgba(10,10,10,0.60) 60%, rgba(10,10,10,0.40) 100%),
+      linear-gradient(to top, rgba(10,10,10,0.50) 0%, transparent 50%);
+  }
+
+  .page-hero .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-hero .section-eyebrow { color: var(--color-accent-500); }
+  .page-hero .section-title { color: #ffffff; margin-top: var(--space-2); }
+  .page-hero .section-subtitle { color: rgba(255, 255, 255, 0.72); margin-top: var(--space-3); max-width: 560px; }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  .btn-ghost-light {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.30);
+    background: transparent;
+  }
+
+  .btn-ghost-light:hover {
+    color: #fff;
+    border-color: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.08);
+  }
 </style>

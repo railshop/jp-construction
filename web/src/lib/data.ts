@@ -8,7 +8,7 @@
  * This means switching CMS mode never requires touching page code.
  */
 
-import config from '../site.config';
+import config from '@/site.config';
 
 // ─── Shared Types ─────────────────────────────────────────────────────────────
 
@@ -42,6 +42,7 @@ export interface Service {
   name: string;
   shortDescription: string;
   description: string;
+  heroTagline?: string;
   priceRange?: { min: number; max: number };
   emergency: boolean;
   icon?: string;
@@ -76,6 +77,7 @@ export interface ServiceArea {
   description?: string;
   zipCodes?: string[];
   responseTime?: string;
+  image?: string;
   localContext?: LocalContext;
 }
 
@@ -98,6 +100,7 @@ export interface Project {
   title: string;
   description: string;
   category: string;
+  clientName?: string;
   completedDate?: string;
   location?: string;
   featured: boolean;
@@ -203,7 +206,7 @@ export async function getServiceAreas(): Promise<ServiceArea[]> {
     return client!.fetch(`*[_type == "serviceArea"] | order(priority asc, name asc) {
       "slug": slug.current, name, county, population, priority,
       lat, lng, nearby[]->{"slug": slug.current},
-      description, zipCodes, responseTime, localContext
+      description, zipCodes, responseTime, "image": image.asset->url, localContext
     }`);
   }
   const local = await getLocalData();
@@ -216,7 +219,7 @@ export async function getAreaBySlug(slug: string): Promise<ServiceArea | null> {
     return client!.fetch(`*[_type == "serviceArea" && slug.current == $slug][0]{
       "slug": slug.current, name, county, population, priority,
       lat, lng, nearby[]->{"slug": slug.current, name},
-      description, zipCodes, responseTime, localContext
+      description, zipCodes, responseTime, "image": image.asset->url, localContext
     }`, { slug });
   }
   const local = await getLocalData();
@@ -256,7 +259,7 @@ export async function getProjects(limit?: number): Promise<Project[]> {
     const client = await getSanityClient();
     const limitClause = limit ? `[0...${limit}]` : '';
     return client!.fetch(`*[_type == "project"] | order(completedDate desc) ${limitClause} {
-      "slug": slug.current, title, description, category,
+      "slug": slug.current, title, description, category, clientName,
       completedDate, location, featured,
       "images": images[].asset->url,
       "beforeImage": beforeImage.asset->url,
@@ -339,14 +342,6 @@ export function generateComboContent(
     : null;
 
   // Build local angle from context if available, fall back to generic
-  const propertyAngle = ctx?.propertyCharacter
-    ? `${area.name}'s ${ctx.propertyCharacter}`
-    : `homes and properties in ${area.name}`;
-
-  const challengeAngle = ctx?.commonChallenges?.length
-    ? ctx.commonChallenges[0]
-    : `the demands of ${area.county || area.name} properties`;
-
   const seasonalAngle = ctx?.seasonalFactors
     ? ctx.seasonalFactors
     : `seasonal conditions in the ${area.county || area.name} area`;
@@ -359,37 +354,22 @@ export function generateComboContent(
     ? ` near ${ctx.landmarks[0]}`
     : '';
 
-  const lotAngle = ctx?.lotProfile
-    ? ` We understand the challenges of ${ctx.lotProfile}.`
-    : '';
-
   return {
-    headline: `${service.name} in ${area.name}, ${area.county || business.address.state}`,
+    headline: `${service.name} in ${area.name}, ${business.address.state}`,
 
-    subheadline: ctx?.propertyCharacter
-      ? `Specialized ${service.name.toLowerCase()} for ${propertyAngle}`
-      : `Professional ${service.name.toLowerCase()} serving ${area.name} and surrounding communities`,
+    subheadline: `Professional ${service.name.toLowerCase()} in ${area.name}, ${business.address.state}. Licensed, insured, and locally based — free estimates on every project.`,
 
-    heroDescription: [
-      `${business.name} provides expert ${service.name.toLowerCase()} to ${communityAngle}${landmarkAngle}.`,
-      ctx?.commonChallenges?.length
-        ? `We know the local conditions — including ${challengeAngle} — and bring the right approach to every job.`
-        : `Every project is handled with the care and expertise your property deserves.`,
-      area.responseTime
-        ? `Our team can typically reach ${area.name} within ${area.responseTime}.`
-        : '',
-    ].filter(Boolean).join(' '),
+    heroDescription: years
+      ? `${business.name} has delivered ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle} for ${years}+ years. Jake Petro manages every project personally — on-site, on schedule, and built to the standard your property deserves.`
+      : `${business.name} delivers ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle}. Jake Petro manages every project personally — on-site, on schedule, and built to the standard your property deserves.`,
 
-    localAngle: ctx?.propertyCharacter
-      ? `${area.name} is home to ${ctx.propertyCharacter}.${lotAngle} Our approach is tailored to what actually works here — not a one-size-fits-all method.`
-      : `We've worked throughout ${area.name} and understand the specific conditions that affect ${service.name.toLowerCase()} quality and longevity here.`,
+    localAngle: ctx?.commonChallenges?.length
+      ? `We've completed projects throughout ${area.name} and know the conditions that affect ${service.name.toLowerCase()} quality here firsthand — from ${ctx.commonChallenges[0].toLowerCase().split(' ').slice(0, 6).join(' ')} to permit timelines with ${area.county || 'local'} offices. That knowledge shapes every decision we make on your project.`
+      : `We've worked throughout ${area.name} and understand the specific site conditions, permit requirements, and construction challenges that affect ${service.name.toLowerCase()} quality and longevity here.`,
 
-    whyUsLocal: [
-      years ? `${years}+ years serving ${business.serviceRadius || business.address.city} and the surrounding area` : `Experienced local team`,
-      `${area.responseTime ? area.responseTime + ' response time to ' + area.name : 'Fast local response'}`,
-      business.license ? business.license : 'Fully licensed and insured',
-      ctx?.permitNotes ? `Familiar with ${area.county || area.name} permit requirements` : 'Free estimates, no obligation',
-    ].join(' · '),
+    whyUsLocal: years
+      ? `${years}+ years serving ${business.serviceRadius || business.address.city}`
+      : `Experienced local contractor serving ${area.name} and surrounding communities`,
 
     processIntro: ctx?.seasonalFactors
       ? `${seasonalAngle} shapes how we approach every ${service.name.toLowerCase()} project in ${area.name}. Here's our process:`

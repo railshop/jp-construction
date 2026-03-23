@@ -7,8 +7,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CtaBanner from '../../components/blocks/CtaBanner.astro';
 import RelatedServices from '../../components/blocks/RelatedServices.astro';
 import { getBusiness, getBlogPosts, getBlogPostBySlug, getServices } from '../../lib/data';
+import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../../lib/urls';
 
 export async function getStaticPaths() {
+  const { default: config } = await import('@/site.config');
+  if (!config.features.blog) return [];
   const posts = await getBlogPosts();
   return posts.map(p => ({ params: { slug: p.slug } }));
 }
@@ -34,7 +37,6 @@ const blogSchema = {
   },
   ...(post.image && { image: post.image }),
 };
-import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../../lib/urls';
 ---
 
 <BaseLayout seo={{
@@ -96,7 +98,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
           <!-- Sidebar -->
           <aside class="post-sidebar">
             <div class="post-sidebar-cta">
-              <h3>Get a Free Quote</h3>
+              <h3>Get an Estimate</h3>
               <p>Ready to get started? Contact {business.name} today.</p>
               <a href={contactUrl()} class="btn btn-primary" style="width:100%; justify-content:center;">Request a Quote</a>
               <a href={business.phoneHref} class="btn btn-ghost" style="width:100%; justify-content:center; margin-top:var(--space-3);">
@@ -125,7 +127,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   <CtaBanner
     headline="Ready to Get Started?"
     subheadline={`Contact ${business.name} for your free estimate.`}
-    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
     variant="brand"

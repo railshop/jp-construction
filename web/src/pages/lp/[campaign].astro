@@ -17,7 +17,7 @@ import CtaBanner from '../../components/blocks/CtaBanner.astro';
 import FaqAccordion from '../../components/blocks/FaqAccordion.astro';
 import Testimonials from '../../components/blocks/Testimonials.astro';
 import { getBusiness, getTestimonials, getFaqs } from '../../lib/data';
-import config from '../../site.config';
+import config from '@/site.config';
 import '../../styles/global.css';
 
 /**
@@ -56,6 +56,7 @@ const campaigns: Campaign[] = [
 ];
 
 export function getStaticPaths() {
+  if (!config.features.campaignLandingPages) return [];
   return campaigns.map(c => ({ params: { campaign: c.slug } }));
 }
 
@@ -125,7 +126,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
             <!-- Lead capture form -->
             <div class="lp-form-col">
               <div class="lp-form-card">
-                <h2 class="lp-form-title">{campaign.formTitle || 'Get Your Free Quote'}</h2>
+                <h2 class="lp-form-title">{campaign.formTitle || 'Get an Estimate'}</h2>
                 <form
                   name={`lp-${campaignSlug}`}
                   method="POST"
@@ -158,7 +159,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
                   </div>
 
                   <button type="submit" class="btn btn-primary btn-lg" style="width:100%; justify-content:center;">
-                    Request My Free Quote
+                    Get an Estimate
                   </button>
 
                   <p class="lp-form-disclaimer">
@@ -185,7 +186,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
       <CtaBanner
         headline="Don't Miss Out"
         subheadline="This offer is for a limited time. Secure your spot now."
-        primaryCta={{ label: 'Get My Free Quote', href: '#lp-form' }}
+        primaryCta={{ label: 'Get an Estimate', href: '#lp-form' }}
         phone={business.phone}
         phoneHref={business.phoneHref}
         variant="brand"

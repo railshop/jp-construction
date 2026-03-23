@@ -1,6 +1,7 @@
 ---
 /**
  * StatsBar.astro
+ * Bold stats bar — numbers in red, structure in near-black.
  */
 
 interface Stat {
@@ -19,10 +20,11 @@ const { stats, variant = 'dark' } = Astro.props;
 <div class:list={['stats-bar', `stats-bar--${variant}`]}>
   <div class="container">
     <ul class="stats-list" role="list">
-      {stats.map(stat => (
+      {stats.map((stat, i) => (
         <li class="stat-item">
           <span class="stat-value">{stat.value}</span>
           <span class="stat-label">{stat.label}</span>
+          {i < stats.length - 1 && <div class="stat-divider" aria-hidden="true"></div>}
         </li>
       ))}
     </ul>
@@ -30,10 +32,27 @@ const { stats, variant = 'dark' } = Astro.props;
 </div>
 
 <style>
-  .stats-bar { padding-block: var(--space-10); }
-  .stats-bar--dark   { background: var(--color-neutral-900); }
-  .stats-bar--brand  { background: var(--color-brand-700); }
-  .stats-bar--light  { background: var(--color-bg-subtle); border-block: 1px solid var(--color-border); }
+  .stats-bar {
+    padding-block: var(--space-12);
+    position: relative;
+  }
+
+  .stats-bar--dark {
+    background: var(--color-brand-950);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stats-bar--brand  {
+    background: var(--color-brand-900);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stats-bar--light  {
+    background: var(--color-bg-subtle);
+    border-block: 1px solid var(--color-border);
+  }
 
   .stats-list {
     list-style: none;
@@ -41,30 +60,67 @@ const { stats, variant = 'dark' } = Astro.props;
     margin: 0;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-8);
+    gap: var(--space-8) var(--space-6);
     text-align: center;
+    position: relative;
   }
 
   @media (min-width: 768px) {
-    .stats-list { grid-template-columns: repeat(4, 1fr); }
+    .stats-list { grid-template-columns: repeat(4, 1fr); gap: 0; }
   }
 
-  .stat-item { display: flex; flex-direction: column; gap: var(--space-1); }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    position: relative;
+    padding-inline: var(--space-4);
+  }
+
+  /* Vertical divider between stats on desktop */
+  .stat-divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .stat-divider {
+      display: block;
+      position: absolute;
+      right: 0;
+      top: 15%;
+      bottom: 15%;
+      width: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .stats-bar--light .stat-divider {
+      background: var(--color-border);
+    }
+  }
 
   .stat-value {
     font-family: var(--font-display);
-    font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
-    font-weight: 800;
-    color: #ffffff;
+    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+    font-weight: 700;
     line-height: 1;
+    color: var(--color-accent-500);
+    letter-spacing: 0;
+    text-transform: uppercase;
   }
 
-  .stats-bar--light .stat-value { color: var(--color-brand-700); }
+  .stats-bar--light .stat-value {
+    color: var(--color-brand-800);
+  }
 
   .stat-label {
     font-size: var(--text-sm);
     font-weight: 500;
-    color: color-mix(in srgb, #ffffff 60%, transparent);
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
   }
 
   .stats-bar--light .stat-label { color: var(--color-text-muted); }

@@ -1,38 +1,53 @@
 ---
 /**
  * GoogleMapsEmbed.astro
- * Embedded Google Map centered on business location.
- * Lazy loads for performance.
+ * Embedded map centered on business location.
+ * When serviceAreas are passed, renders an interactive Leaflet map with
+ * clickable service area overlays. Falls back to a Google Maps iframe
+ * when no service areas are provided.
  */
 
 import { getBusiness } from '../../lib/data';
-import config from '../../site.config';
+import type { ServiceArea } from '../../lib/data';
+import config from '@/site.config';
 
 interface Props {
   zoom?: number;
   height?: string;
   showInfo?: boolean;
+  serviceAreas?: ServiceArea[];
 }
 
-const { zoom = 13, height = '400px', showInfo = true } = Astro.props;
-const business = await getBusiness();
+const {
+  height = '480px',
+  showInfo = true,
+  serviceAreas = [],
+} = Astro.props;
 
+const zoom = Astro.props.zoom ?? (serviceAreas.length > 0 ? 10 : 13);
+
+const business = await getBusiness();
 const apiKey = config.googleMapsApiKey;
 const lat = business.coordinates?.lat;
 const lng = business.coordinates?.lng;
 
+// Iframe fallback (used when no service areas are shown)
 const embedSrc = apiKey && lat && lng
   ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lng}&zoom=${zoom}`
   : null;
-
 const fallbackSrc = lat && lng
   ? `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`
   : null;
-
 const mapSrc = embedSrc || fallbackSrc;
+
+// Serialize area data for the client script
+const useLeaflet = serviceAreas.length > 0 && lat && lng;
+const areaPoints = serviceAreas
+  .filter(a => a.lat && a.lng)
+  .map(a => ({ slug: a.slug, name: a.name, lat: a.lat, lng: a.lng, priority: a.priority }));
 ---
 
-{mapSrc && (
+{(useLeaflet || mapSrc) && (
   <section class="map-section section-sm">
     <div class="container">
       {showInfo && (
@@ -55,18 +70,65 @@ const mapSrc = embedSrc || fallbackSrc;
           </div>
         </div>
       )}
+
       <div class="map-frame-wrapper" style={`height: ${height}`}>
-        <iframe
-          src={mapSrc}
-          class="map-frame"
-          width="100%"
-          height="100%"
-          style="border:0;"
-          allowfullscreen
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          title={`Map showing ${business.name} service area`}
-        ></iframe>
+
+        {useLeaflet ? (
+          <!-- Interactive Leaflet map with service area overlays -->
+          <div
+            id="leaflet-map"
+            class="map-frame"
+            data-lat={lat}
+            data-lng={lng}
+            data-zoom={zoom}
+            data-areas={JSON.stringify(areaPoints)}
+            data-business={business.name}
+            aria-label={`Interactive map showing ${business.name} service areas`}
+          ></div>
+        ) : (
+          <!-- Iframe fallback when no service areas -->
+          <iframe
+            src={mapSrc}
+            class="map-frame"
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title={`Map showing ${business.name} service area`}
+          ></iframe>
+        )}
+
+        {useLeaflet && areaPoints.length > 0 && (
+          <div class="map-areas-overlay" aria-label="Service areas">
+            <div class="map-areas-header">
+              <p class="map-areas-label">Service Areas</p>
+              <button class="map-reset-btn" id="map-reset-btn" type="button" aria-label="Reset map view">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                  <path d="M3 3v5h5"/>
+                </svg>
+                Reset
+              </button>
+            </div>
+            <ul class="map-areas-list">
+              {serviceAreas.filter(a => a.lat && a.lng).map(area => (
+                <li>
+                  <button
+                    class:list={['map-area-btn', `map-area--${area.priority}`]}
+                    data-area-slug={area.slug}
+                    type="button"
+                  >
+                    <span class="map-area-dot" aria-hidden="true"></span>
+                    {area.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
       </div>
     </div>
   </section>
@@ -106,7 +168,230 @@ const mapSrc = embedSrc || fallbackSrc;
     border-radius: var(--radius-xl);
     overflow: hidden;
     border: 1px solid var(--color-border);
+    position: relative;
   }
 
-  .map-frame { display: block; }
+  .map-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Service areas overlay panel */
+  .map-areas-overlay {
+    position: absolute;
+    bottom: var(--space-6);
+    right: var(--space-4);
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    max-width: 190px;
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+  }
+
+  .map-areas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .map-areas-label {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    margin: 0;
+  }
+
+  .map-reset-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 2px 6px;
+    cursor: pointer;
+    line-height: 1.4;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .map-reset-btn:hover {
+    color: var(--color-accent-500);
+    border-color: var(--color-accent-500);
+  }
+
+  .map-areas-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .map-area-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    line-height: 1.4;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    width: 100%;
+    text-align: left;
+    transition: background var(--transition-fast);
+  }
+
+  .map-area-btn:hover {
+    background: var(--color-bg-muted);
+  }
+
+  .map-area-btn.is-active {
+    background: color-mix(in srgb, var(--color-accent-500) 10%, transparent);
+    color: var(--color-accent-600);
+    font-weight: 700;
+  }
+
+  .map-area-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  .map-area-btn.is-active .map-area-dot {
+    transform: scale(1.4);
+  }
+
+  .map-area--primary   .map-area-dot { background: var(--color-accent-500); }
+  .map-area--secondary .map-area-dot { background: var(--color-brand-400); }
+  .map-area--tertiary  .map-area-dot { background: var(--color-neutral-300); }
+
+  .map-area--primary   { font-weight: 600; }
+  .map-area--secondary { font-weight: 400; }
+  .map-area--tertiary  { color: var(--color-text-muted); }
 </style>
+
+{useLeaflet && (
+  <script is:inline>
+    (function () {
+      // Load Leaflet CSS
+      var cssLink = document.createElement('link');
+      cssLink.rel = 'stylesheet';
+      cssLink.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(cssLink);
+
+      // Load Leaflet JS then initialise
+      var script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = function () {
+        var mapEl = document.getElementById('leaflet-map');
+        if (!mapEl) return;
+
+        var lat  = parseFloat(mapEl.dataset.lat || '0');
+        var lng  = parseFloat(mapEl.dataset.lng || '0');
+        var zoom = parseInt(mapEl.dataset.zoom || '10');
+        var areas = JSON.parse(mapEl.dataset.areas || '[]');
+        var businessName = mapEl.dataset.business || '';
+
+        var L = window.L;
+        var defaultZoom = 11;
+        var map = L.map('leaflet-map', { zoomControl: true }).setView([lat, lng], defaultZoom);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 19,
+        }).addTo(map);
+
+        // Red dot marker for business location
+        var redIcon = L.divIcon({
+          className: '',
+          html: '<div style="width:14px;height:14px;background:#dc1f26;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+        });
+        L.marker([lat, lng], { icon: redIcon }).addTo(map)
+          .bindPopup('<strong>' + businessName + '</strong>', { closeButton: false });
+
+        // Build circle overlays and add all to map immediately
+        var circles = {};
+        var allCircles = [];
+        areas.forEach(function (area) {
+          var circle = L.circle([area.lat, area.lng], {
+            color: '#dc1f26',
+            fillColor: '#dc1f26',
+            fillOpacity: 0.10,
+            opacity: 0.40,
+            weight: 1.5,
+            radius: 4200,
+          }).addTo(map);
+          circles[area.slug] = circle;
+          allCircles.push(circle);
+        });
+
+        // Reset: return to North Huntingdon pin at default zoom
+        var activeSlug = null;
+
+        function resetView() {
+          map.setView([lat, lng], defaultZoom, { animate: true, duration: 0.5 });
+          allCircles.forEach(function (c) {
+            c.setStyle({ fillOpacity: 0.10, opacity: 0.40, weight: 1.5 });
+          });
+          document.querySelectorAll('[data-area-slug]').forEach(function (b) {
+            b.classList.remove('is-active');
+          });
+          activeSlug = null;
+        }
+
+        var resetBtn = document.getElementById('map-reset-btn');
+        if (resetBtn) resetBtn.addEventListener('click', resetView);
+
+        document.querySelectorAll('[data-area-slug]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var slug = btn.dataset.areaSlug;
+
+            // Toggle off if same area clicked
+            if (activeSlug === slug) {
+              resetView();
+              return;
+            }
+
+            // Dim all circles, highlight the selected one
+            allCircles.forEach(function (c) {
+              c.setStyle({ fillOpacity: 0.04, opacity: 0.20, weight: 1 });
+            });
+            circles[slug].setStyle({ fillOpacity: 0.18, opacity: 0.70, weight: 2 });
+
+            // Update active button state
+            document.querySelectorAll('[data-area-slug]').forEach(function (b) {
+              b.classList.remove('is-active');
+            });
+            btn.classList.add('is-active');
+            activeSlug = slug;
+
+            // Zoom to selected area
+            var area = areas.find(function (a) { return a.slug === slug; });
+            map.setView([area.lat, area.lng], 12, { animate: true, duration: 0.5 });
+          });
+        });
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+)}

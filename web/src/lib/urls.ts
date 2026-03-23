@@ -6,7 +6,7 @@
  * here and it propagates everywhere automatically.
  */
 
-import config from '../site.config';
+import config from '@/site.config';
 
 // ─── Page URLs ────────────────────────────────────────────────────────────────
 

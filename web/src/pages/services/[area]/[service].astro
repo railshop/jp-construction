@@ -19,8 +19,6 @@ import Testimonials from '../../../components/blocks/Testimonials.astro';
 import FaqAccordion from '../../../components/blocks/FaqAccordion.astro';
 import RelatedServices from '../../../components/blocks/RelatedServices.astro';
 import CtaBanner from '../../../components/blocks/CtaBanner.astro';
-import StatsBar from '../../../components/blocks/StatsBar.astro';
-
 import {
   getBusiness,
   getServices,
@@ -30,7 +28,7 @@ import {
   generateComboFaqs,
 } from '../../../lib/data';
 import SeoServiceAreas from '../../../components/seo/SeoServiceAreas.astro';
-import config from '../../../site.config';
+import config from '@/site.config';
 
 export async function getStaticPaths() {
   const services = await getServices();
@@ -61,18 +59,9 @@ const testimonials = relevantTestimonials.length >= 2
   ? relevantTestimonials
   : allTestimonials.filter(t => t.featured).slice(0, 3);
 
-// Nearby areas from the same area data
-const nearbyAreas = area.nearby
-  ? areas.filter(a => (area.nearby as string[]).includes(a.slug)).slice(0, 5)
-  : [];
-
 // Generate locally-aware content
 const content  = generateComboContent(service, area, business);
 const comboFaqs = generateComboFaqs(service, area, business);
-
-const years = business.yearEstablished
-  ? new Date().getFullYear() - business.yearEstablished
-  : null;
 
 // JSON-LD — LocalBusiness scoped to this city + Service
 const comboSchema = [
@@ -139,14 +128,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
   <!-- Combo hero -->
   <div class="combo-hero">
-    {service.image && (
-      <div class="combo-hero-bg" aria-hidden="true">
-        <img src={service.image} alt="" width="1280" height="520" />
-        <div class="combo-hero-overlay"></div>
-      </div>
-    )}
-
-    <div class="container combo-hero-content">
+    <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href={homeUrl()}>Home</a>
         <span aria-hidden="true">/</span>
@@ -157,127 +139,133 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
         <span aria-current="page">{service.name}</span>
       </nav>
 
-      <div class="combo-hero-grid">
-        <div class="combo-hero-text">
-          <!-- Area + service badge -->
-          <div class="combo-badges">
-            <span class="badge badge-brand">{area.name}</span>
-            {service.emergency && <span class="badge badge-accent">24/7 Emergency</span>}
-          </div>
-
-          <h1 class="combo-headline">{content.headline}</h1>
-          <p class="combo-subheadline">{content.subheadline}</p>
-          <p class="combo-description">{content.heroDescription}</p>
-
-          <div class="combo-hero-actions">
-            <a href={contactUrl()} class="btn btn-primary btn-lg">Get a Free Quote</a>
-            <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
-          </div>
-
-          <!-- Local why-us strip -->
-          <p class="combo-why-us">{content.whyUsLocal}</p>
+      {service.emergency && (
+        <div class="combo-badges">
+          <span class="badge badge-accent">24/7 Emergency</span>
         </div>
+      )}
 
-        <!-- Sidebar quick facts -->
-        <aside class="combo-sidebar">
-          <div class="combo-sidebar-card">
-            <h2 class="combo-sidebar-title">Service Details</h2>
+      <p class="section-eyebrow">Our Services</p>
+      <h1 class="combo-headline section-title">{content.headline}</h1>
+      <p class="combo-subheadline">{content.subheadline}</p>
 
-            <div class="combo-fact">
-              <span class="combo-fact-label">Location</span>
-              <span class="combo-fact-value">{area.name}{area.county ? `, ${area.county}` : ''}</span>
-            </div>
-
-            {area.responseTime && (
-              <div class="combo-fact">
-                <span class="combo-fact-label">Response Time</span>
-                <span class="combo-fact-value combo-fact-highlight">{area.responseTime}</span>
-              </div>
-            )}
-
-            {service.priceRange && (
-              <div class="combo-fact">
-                <span class="combo-fact-label">Typical Range</span>
-                <span class="combo-fact-value">${service.priceRange.min.toLocaleString()} – ${service.priceRange.max.toLocaleString()}</span>
-              </div>
-            )}
-
-            <div class="combo-fact">
-              <span class="combo-fact-label">Availability</span>
-              <span class="combo-fact-value">{service.emergency ? '24/7 Emergency' : 'By Appointment'}</span>
-            </div>
-
-            {business.license && (
-              <div class="combo-fact">
-                <span class="combo-fact-label">License</span>
-                <span class="combo-fact-value">{business.license}</span>
-              </div>
-            )}
-
-            <a href={contactUrl()} class="btn btn-primary" style="width:100%; justify-content:center; margin-top:var(--space-5);">
-              Schedule Service
-            </a>
-            <a href={business.phoneHref} class="btn btn-ghost" style="width:100%; justify-content:center; margin-top:var(--space-3);">
-              {business.phone}
-            </a>
-          </div>
-        </aside>
+      <div class="hero-actions">
+        <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
+        <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
       </div>
     </div>
   </div>
 
-  <!-- Local angle section -->
-  {area.localContext && (
-    <section class="section-sm local-angle-section">
-      <div class="container">
-        <div class="local-angle-grid">
-          <div class="local-angle-content">
-            <p class="section-eyebrow">Why Local Matters</p>
-            <h2 class="local-angle-title">
-              {service.name} Built for {area.name} Properties
-            </h2>
-            <p class="local-angle-body">{content.localAngle}</p>
-
-            {area.localContext.commonChallenges && area.localContext.commonChallenges.length > 0 && (
-              <div class="local-challenges">
-                <p class="local-challenges-label">Common local challenges we address:</p>
-                <ul class="local-challenges-list" role="list">
-                  {area.localContext.commonChallenges.map(challenge => (
-                    <li class="local-challenge-item">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                      {challenge}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+  <!-- Local intro — copy + area photo -->
+  <section class="combo-intro section">
+    <div class="container">
+      <div class="combo-intro-grid">
+        <div class="combo-intro-text">
+          <p class="section-eyebrow">Serving {area.name}, {business.address.state}</p>
+          <h2 class="combo-intro-heading">{service.shortDescription}</h2>
+          <p class="combo-intro-desc">{content.heroDescription}</p>
+          <ul class="combo-trust-list" aria-label="Why choose JP Construction">
+            <li class="combo-trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Licensed &amp; Insured
+            </li>
+            <li class="combo-trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Free Estimates
+            </li>
+            {service.emergency && (
+              <li class="combo-trust-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                24/7 Emergency Response
+              </li>
             )}
+            {area.responseTime && (
+              <li class="combo-trust-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                {area.responseTime} response to {area.name}
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div class="combo-intro-media">
+          {(area.image || service.image)
+            ? <img
+                src={area.image || service.image}
+                alt={`${area.name}, ${area.county || business.address.state}`}
+                loading="lazy"
+                width="800"
+                height="600"
+              />
+            : <div class="combo-intro-media-fallback" aria-hidden="true">
+                <span>{area.name}</span>
+              </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why local matters -->
+  {area.localContext && (
+    <section class="local-angle-section section">
+      <div class="container">
+
+        <!-- Header -->
+        <div class="local-angle-header">
+          <p class="section-eyebrow">Why Local Matters</p>
+          <h2 class="section-title">{service.name} Built for {area.name} Properties</h2>
+        </div>
+
+        <!-- 2-col: prose left, challenges right -->
+        <div class="local-angle-grid">
+          <div class="local-prose-block">
+            <p class="local-angle-lead">{content.localAngle}</p>
           </div>
 
-          {area.localContext.notableFeatures && area.localContext.notableFeatures.length > 0 && (
-            <div class="local-features">
-              <p class="local-features-label">Area characteristics</p>
-              <ul class="local-features-list" role="list">
-                {area.localContext.notableFeatures.map(feature => (
-                  <li class="badge badge-neutral local-feature-badge">{feature}</li>
+          {area.localContext.commonChallenges && area.localContext.commonChallenges.length > 0 && (
+            <div class="local-challenges-block">
+              <p class="local-block-label">Common challenges we address here</p>
+              <ul class="local-challenges-list" role="list">
+                {area.localContext.commonChallenges.map(challenge => (
+                  <li class="local-challenge-item">
+                    <span class="local-challenge-icon" aria-hidden="true">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </span>
+                    {challenge.charAt(0).toUpperCase() + challenge.slice(1)}
+                  </li>
                 ))}
               </ul>
             </div>
           )}
         </div>
+
+        <!-- Full-width bottom card: seasonal + features combined -->
+        {(area.localContext.seasonalFactors || (area.localContext.notableFeatures && area.localContext.notableFeatures.length > 0)) && (
+          <div class="local-bottom-card">
+            {area.localContext.seasonalFactors && (
+              <div class="local-bottom-seasonal">
+                <p class="local-block-label">Seasonal Considerations</p>
+                <p class="local-seasonal-text">{(s => s.endsWith('.') ? s : s + '.')(area.localContext.seasonalFactors!.charAt(0).toUpperCase() + area.localContext.seasonalFactors!.slice(1))}</p>
+              </div>
+            )}
+            {area.localContext.notableFeatures && area.localContext.notableFeatures.length > 0 && (
+              <div class="local-bottom-features">
+                <p class="local-block-label">Area Context</p>
+                <div class="local-features-strip">
+                  {area.localContext.notableFeatures.map(feature => (
+                    <span class="badge badge-neutral">{feature}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </section>
-  )}
-
-  <!-- Stats -->
-  {years && (
-    <StatsBar stats={[
-      { value: `${years}+`, label: 'Years Serving the Area' },
-      { value: '1,000+', label: 'Projects Completed' },
-      { value: '5★', label: 'Average Rating' },
-      { value: area.responseTime || 'Fast', label: 'Response to ' + area.name },
-    ]} />
   )}
 
   <!-- Process steps -->
@@ -286,9 +274,17 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
       steps={service.processSteps}
       eyebrow={`Our ${area.name} Process`}
       title={`How We Handle ${service.name} in ${area.name}`}
-      subtitle={content.processIntro}
     />
   )}
+
+  <!-- Combo FAQs -->
+  <FaqAccordion
+    faqs={comboFaqs}
+    eyebrow="FAQ"
+    title={`${service.name} in ${area.name} — Common Questions`}
+    includeSchema={false}
+    variant="dark"
+  />
 
   <!-- Testimonials -->
   {testimonials.length > 0 && (
@@ -298,52 +294,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
       eyebrow="Local Reviews"
       title={`What ${area.name} Customers Say`}
     />
-  )}
-
-  <!-- Combo FAQs -->
-  <FaqAccordion
-    faqs={comboFaqs}
-    eyebrow="FAQ"
-    title={`${service.name} in ${area.name} — Common Questions`}
-    subtitle={content.faqIntro}
-    includeSchema={false}
-  />
-
-  <!-- Nearby areas for same service — strong internal link signal -->
-  {nearbyAreas.length > 0 && (
-    <section class="section-sm nearby-combo-section">
-      <div class="container">
-        <h2 class="nearby-combo-title">
-          {service.name} Near {area.name}
-        </h2>
-        <p class="nearby-combo-subtitle">
-          We also provide {service.name.toLowerCase()} in these nearby communities:
-        </p>
-        <ul class="nearby-combo-list" role="list">
-          {nearbyAreas.map(nearby => (
-            <li>
-              <a href={`/services/${nearby.slug}/${service.slug}/`} class="nearby-combo-link">
-                {service.name} in {nearby.name}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                  <polyline points="12 5 19 12 12 19"/>
-                </svg>
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <!-- Also link back to the area's main page and service's main page -->
-        <div class="combo-crosslinks">
-          <a href={`/areas/${area.slug}/`} class="crosslink">
-            All services in {area.name} →
-          </a>
-          <a href={`/services/${service.slug}/`} class="crosslink">
-            {service.name} across all areas →
-          </a>
-        </div>
-      </div>
-    </section>
   )}
 
   <!-- All areas for this service — internal link mesh -->
@@ -358,13 +308,14 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     services={services}
     currentSlug={service.slug}
     title={`Other Services in ${area.name}`}
+    areaSlug={areaSlug}
   />
 
   <!-- Final CTA -->
   <CtaBanner
     headline={content.ctaHeadline}
     subheadline={`Licensed, insured, and ${area.responseTime ? area.responseTime + ' away' : 'local to ' + area.name}. Get your free estimate today.`}
-    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
     variant="brand"
@@ -374,176 +325,216 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 <style>
   /* ── Hero ─────────────────────────────────────────────────────────────────── */
   .combo-hero {
-    position: relative;
-    background: var(--color-neutral-900);
-    padding: var(--space-10) 0 var(--space-14);
+    padding: var(--space-24) 0 var(--space-20);
+    background: linear-gradient(160deg, var(--color-brand-900) 0%, var(--color-brand-950) 100%);
   }
-
-  .combo-hero-bg {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-  }
-
-  .combo-hero-bg img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .combo-hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-neutral-950) 88%, transparent),
-      color-mix(in srgb, var(--color-neutral-950) 55%, transparent)
-    );
-  }
-
-  .combo-hero-content { position: relative; z-index: 1; }
 
   .breadcrumb {
     display: flex;
     align-items: center;
     gap: var(--space-2);
     font-size: var(--text-sm);
-    color: var(--color-neutral-500);
+    color: var(--color-neutral-400);
     margin-bottom: var(--space-8);
     flex-wrap: wrap;
   }
 
   .breadcrumb a { color: var(--color-neutral-400); text-decoration: none; }
   .breadcrumb a:hover { color: #ffffff; }
-
-  .combo-hero-grid {
-    display: grid;
-    gap: var(--space-10);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 1024px) {
-    .combo-hero-grid { grid-template-columns: 1fr 320px; align-items: start; }
-  }
+  .breadcrumb span[aria-hidden] { color: var(--color-neutral-600); }
 
   .combo-badges {
     display: flex;
     gap: var(--space-2);
-    margin-bottom: var(--space-4);
-  }
-
-  .combo-headline {
-    font-family: var(--font-display);
-    font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1.1;
-    margin: 0 0 var(--space-3);
-  }
-
-  .combo-subheadline {
-    font-size: var(--text-xl);
-    font-weight: 500;
-    color: var(--color-brand-300);
-    margin: 0 0 var(--space-4);
-    line-height: 1.4;
-  }
-
-  .combo-description {
-    font-size: var(--text-lg);
-    color: var(--color-neutral-300);
-    line-height: 1.7;
-    margin: 0 0 var(--space-6);
-    max-width: 580px;
-  }
-
-  .combo-hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
     margin-bottom: var(--space-5);
   }
 
-  .combo-hero-actions .btn-ghost {
+  .combo-hero .section-eyebrow { color: var(--color-accent-500); }
+
+  .combo-headline {
+    color: #ffffff;
+    margin-top: var(--space-2);
+    max-width: 900px;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .combo-subheadline {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.65);
+    margin: var(--space-4) 0 0;
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  .combo-hero .btn-ghost {
     color: #ffffff;
     border-color: var(--color-neutral-500);
   }
 
-  .combo-why-us {
-    font-size: var(--text-sm);
-    color: var(--color-neutral-400);
+  .combo-hero .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-neutral-300);
+  }
+
+  /* ── Local intro ─────────────────────────────────────────────────────────── */
+  .combo-intro {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .combo-intro-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .combo-intro-grid {
+      grid-template-columns: 55fr 45fr;
+      gap: var(--space-16);
+    }
+  }
+
+  .combo-intro-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .combo-intro-heading {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--color-text);
+    margin: var(--space-3) 0 var(--space-5);
+  }
+
+  .combo-intro-desc {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.75;
+    margin: 0 0 var(--space-6);
+  }
+
+  .combo-trust-list {
+    list-style: none;
+    padding: 0;
     margin: 0;
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-neutral-800);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
   }
 
-  /* ── Sidebar ──────────────────────────────────────────────────────────────── */
-  .combo-sidebar-card {
-    background: var(--color-bg);
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
-    box-shadow: var(--shadow-xl);
+  .combo-trust-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
   }
 
-  .combo-sidebar-title {
-    font-family: var(--font-body);
+  .combo-trust-item svg {
+    color: var(--color-accent-500);
+    flex-shrink: 0;
+  }
+
+  .combo-intro-media {
+    position: relative;
+    min-height: 420px;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+  }
+
+  .combo-intro-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .combo-intro-media-fallback {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, var(--color-brand-800) 0%, var(--color-brand-900) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .combo-intro-media-fallback span {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: rgba(255,255,255,0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Why local matters ───────────────────────────────────────────────────── */
+  .local-angle-section {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .local-angle-header {
+    max-width: 720px;
+    margin-bottom: var(--space-10);
+  }
+
+  /* 2-col: prose left, challenges right */
+  .local-angle-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .local-angle-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: start;
+    }
+  }
+
+  .local-prose-block {
+    padding-right: var(--space-4);
+  }
+
+  .local-angle-lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .local-block-label {
     font-size: var(--text-xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-5);
+    color: var(--color-text-subtle);
+    margin: 0 0 var(--space-4);
   }
 
-  .combo-fact {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--space-4);
-    padding-block: var(--space-3);
-    border-bottom: 1px solid var(--color-border);
-    font-size: var(--text-sm);
-  }
-
-  .combo-fact:last-of-type { border-bottom: none; }
-  .combo-fact-label { color: var(--color-text-muted); flex-shrink: 0; }
-  .combo-fact-value { font-weight: 600; color: var(--color-text); text-align: right; }
-  .combo-fact-highlight { color: var(--color-brand-700); }
-
-  /* ── Local angle ─────────────────────────────────────────────────────────── */
-  .local-angle-section { background: var(--color-bg-subtle); border-bottom: 1px solid var(--color-border); }
-
-  .local-angle-grid {
-    display: grid;
-    gap: var(--space-10);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 768px) {
-    .local-angle-grid { grid-template-columns: 1fr auto; align-items: start; }
-  }
-
-  .local-angle-title {
-    font-family: var(--font-display);
-    font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
-    font-weight: 700;
-    margin: var(--space-2) 0 var(--space-4);
-  }
-
-  .local-angle-body {
-    font-size: var(--text-base);
-    color: var(--color-text-muted);
-    line-height: 1.7;
-    margin: 0;
-  }
-
-  .local-challenges { margin-top: var(--space-5); }
-
-  .local-challenges-label {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--color-text);
-    margin: 0 0 var(--space-3);
+  /* Challenges (right col) */
+  .local-challenges-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5) var(--space-6);
   }
 
   .local-challenges-list {
@@ -552,104 +543,74 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
   }
 
   .local-challenge-item {
     display: flex;
-    align-items: center;
-    gap: var(--space-2);
+    align-items: flex-start;
+    gap: var(--space-3);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    line-height: 1.55;
   }
 
-  .local-challenge-item svg { color: var(--color-brand-600); flex-shrink: 0; }
+  .local-challenge-item:last-child { border-bottom: none; }
 
-  .local-features { min-width: 200px; }
-
-  .local-features-label {
-    font-size: var(--text-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-3);
+  .local-challenge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-accent-500);
+    flex-shrink: 0;
+    margin-top: 1px;
   }
 
-  .local-features-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .local-challenge-icon svg { color: #ffffff; }
+
+  /* Bottom card: seasonal + features combined */
+  .local-bottom-card {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent-500);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-6);
+    margin-top: var(--space-8);
   }
 
-  .local-feature-badge { justify-content: flex-start; }
-
-  /* ── Nearby combos ───────────────────────────────────────────────────────── */
-  .nearby-combo-section {
-    background: var(--color-bg-subtle);
-    border-top: 1px solid var(--color-border);
+  @media (min-width: 768px) {
+    .local-bottom-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: flex-start;
+    }
   }
 
-  .nearby-combo-title {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 700;
-    margin: 0 0 var(--space-2);
+  .local-bottom-seasonal .local-block-label,
+  .local-bottom-features .local-block-label {
+    margin-bottom: var(--space-3);
   }
 
-  .nearby-combo-subtitle {
+  .local-seasonal-text {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
-    margin: 0 0 var(--space-5);
+    line-height: 1.7;
+    margin: 0;
   }
 
-  .nearby-combo-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 var(--space-6);
+  .local-features-strip {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
   }
-
-  .nearby-combo-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-brand-700);
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-200);
-    border-radius: var(--radius-full);
-    text-decoration: none;
-    transition: all var(--transition-fast);
-  }
-
-  .nearby-combo-link:hover {
-    background: var(--color-brand-100);
-    border-color: var(--color-brand-400);
-  }
-
-  .combo-crosslinks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4) var(--space-8);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .crosslink {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--color-brand-600);
-    text-decoration: none;
-    transition: color var(--transition-fast);
-  }
-
-  .crosslink:hover { color: var(--color-brand-800); }
 </style>

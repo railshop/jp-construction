@@ -8,6 +8,7 @@ export default {
     { name: 'slug',          type: 'slug',   title: 'Slug',               options: { source: 'title' }, validation: (R: any) => R.required() },
     { name: 'description',   type: 'text',   title: 'Short Description',  rows: 3, validation: (R: any) => R.required() },
     { name: 'category',      type: 'string', title: 'Category (e.g. Landscaping, Hardscape)', validation: (R: any) => R.required() },
+    { name: 'clientName',    type: 'string', title: 'Client Name (e.g. "The Hartmann Family")' },
     { name: 'location',      type: 'string', title: 'Location (City, State)' },
     { name: 'completedDate', type: 'date',   title: 'Completion Date' },
     { name: 'featured',      type: 'boolean', title: 'Featured Project?', initialValue: false },

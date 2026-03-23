@@ -7,8 +7,7 @@
 import SEO, { type SEOProps } from '../components/seo/SEO.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
-import StickyPhoneBar from '../components/blocks/StickyPhoneBar.astro';
-import config from '../site.config';
+import config from '@/site.config';
 import '../styles/global.css';
 
 interface Props {
@@ -23,6 +22,11 @@ const { seo, fullWidthHero = false } = Astro.props;
 <html lang="en">
   <head>
     <SEO seo={seo} />
+
+    <!-- Google Fonts — preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lato:ital,wght@0,400;0,700;1,400&display=swap" />
 
     <!-- Google Tag Manager -->
     {config.gtmId && (
@@ -69,7 +73,5 @@ const { seo, fullWidthHero = false } = Astro.props;
 
     <Footer />
 
-    <!-- Sticky phone bar — mobile only, shown on all pages -->
-    <StickyPhoneBar />
   </body>
 </html>

@@ -6,10 +6,14 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ServiceCardsGrid from '../../components/blocks/ServiceCardsGrid.astro';
 import CtaBanner from '../../components/blocks/CtaBanner.astro';
-import { getBusiness, getServices } from '../../lib/data';
+import { getBusiness, getServices, getServiceAreas } from '../../lib/data';
+import { contactUrl, areasUrl } from '../../lib/urls';
 
 const business = await getBusiness();
 const services = await getServices();
+const areas    = await getServiceAreas();
+const primaryAreas   = areas.filter(a => a.priority === 'primary');
+const secondaryAreas = areas.filter(a => a.priority === 'secondary');
 ---
 
 <BaseLayout seo={{
@@ -20,10 +24,14 @@ const services = await getServices();
   <div class="page-hero">
     <div class="container">
       <p class="section-eyebrow">What We Do</p>
-      <h1 class="section-title">Our Services</h1>
+      <h1 class="section-title">Every Service.<br/>One Contractor.</h1>
       <p class="section-subtitle">
-        From routine maintenance to complete transformations — we handle every job with professionalism and care.
+        From custom homes to commercial additions, we handle every scope of work with the same licensed crew, honest pricing, and one direct line to the owner.
       </p>
+      <div class="hero-actions">
+        <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
+        <a href={areasUrl()} class="btn btn-ghost-light btn-lg">View Service Areas</a>
+      </div>
     </div>
   </div>
 
@@ -31,7 +39,65 @@ const services = await getServices();
     services={services}
     columns={3}
     showPricing={true}
+    showViewAll={false}
   />
+
+  <!-- Where We Work -->
+  <section class="areas-strip section-sm">
+    <div class="container">
+      <div class="areas-strip-header">
+        <div>
+          <p class="section-eyebrow">Where We Work</p>
+          <h2 class="areas-strip-title">Areas We Serve</h2>
+        </div>
+        <a href="/areas/" class="areas-strip-link">
+          View all areas
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+
+      <ul class="areas-primary-grid" role="list">
+        {primaryAreas.map(area => (
+          <li>
+            <a href={`/areas/${area.slug}/`} class="area-card area-card--primary">
+              <div class="area-card-body">
+                <span class="area-card-name">{area.name}</span>
+                {area.responseTime && (
+                  <span class="area-card-response">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {area.responseTime}
+                  </span>
+                )}
+              </div>
+              <svg class="area-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      {secondaryAreas.length > 0 && (
+        <div class="areas-secondary-row">
+          <span class="areas-secondary-label">Also serving:</span>
+          <ul class="areas-pills" role="list">
+            {secondaryAreas.map(area => (
+              <li>
+                <a href={`/areas/${area.slug}/`} class="area-pill">{area.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </section>
 
   <CtaBanner
     headline="Not Sure Which Service You Need?"
@@ -44,10 +110,227 @@ const services = await getServices();
 
 <style>
   .page-hero {
-    background: var(--color-bg-subtle);
-    border-bottom: 1px solid var(--color-border);
-    padding: var(--space-16) 0 var(--space-10);
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-24) 0 var(--space-20);
+    background-color: var(--color-brand-900);
   }
 
-  .page-hero .section-subtitle { margin-top: var(--space-3); }
+  /* Background image */
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center 40%;
+  }
+
+  /* Dark overlay — heavier left where text lives */
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to right, rgba(10,10,10,0.82) 0%, rgba(10,10,10,0.60) 60%, rgba(10,10,10,0.40) 100%),
+      linear-gradient(to top, rgba(10,10,10,0.50) 0%, transparent 50%);
+  }
+
+  .page-hero .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-hero .section-eyebrow {
+    color: var(--color-accent-500);
+  }
+
+  .page-hero .section-title {
+    color: #ffffff;
+    margin-top: var(--space-2);
+  }
+
+  .page-hero .section-subtitle {
+    color: rgba(255, 255, 255, 0.72);
+    margin-top: var(--space-3);
+    max-width: 560px;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  .btn-ghost-light {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.30);
+    background: transparent;
+  }
+
+  .btn-ghost-light:hover {
+    color: #fff;
+    border-color: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* ── Areas Strip ─────────────────────────────────────────────────────────── */
+  .areas-strip {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-sm {
+    padding: var(--space-16) 0;
+  }
+
+  .areas-strip-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .areas-strip-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
+    font-weight: 700;
+    color: var(--color-text);
+    margin: var(--space-1) 0 0;
+    line-height: 1.2;
+  }
+
+  .areas-strip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent-500);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: gap 0.15s ease;
+  }
+
+  .areas-strip-link:hover {
+    gap: var(--space-2);
+  }
+
+  .areas-primary-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 640px) {
+    .areas-primary-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .areas-primary-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .area-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .area-card--primary { border-left: 3px solid var(--color-accent-500); }
+
+  .area-card:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateX(3px);
+  }
+
+  .area-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .area-card-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+  }
+
+  .area-card-response {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .area-card-arrow {
+    flex-shrink: 0;
+    color: var(--color-text-subtle);
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+
+  .area-card:hover .area-card-arrow {
+    color: var(--color-brand-600);
+    transform: translateX(2px);
+  }
+
+  .areas-secondary-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .areas-secondary-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .areas-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .area-pill {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .area-pill:hover {
+    border-color: var(--color-brand-300);
+    color: var(--color-brand-700);
+  }
 </style>

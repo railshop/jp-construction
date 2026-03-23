@@ -7,7 +7,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import BeforeAfterSlider from '../../components/blocks/BeforeAfterSlider.astro';
 import CtaBanner from '../../components/blocks/CtaBanner.astro';
 import { getBusiness, getProjects } from '../../lib/data';
-import config from '../../site.config';
+import config from '@/site.config';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -61,6 +61,13 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
         </div>
 
         <aside class="project-facts">
+          <p class="project-facts-header">Project Details</p>
+          {project.clientName && (
+            <div class="project-fact">
+              <span class="project-fact-label">Client</span>
+              <span class="project-fact-value">{project.clientName}</span>
+            </div>
+          )}
           {project.location && (
             <div class="project-fact">
               <span class="project-fact-label">Location</span>
@@ -73,13 +80,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
               <span class="project-fact-value">{new Date(project.completedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
             </div>
           )}
-          {project.category && (
-            <div class="project-fact">
-              <span class="project-fact-label">Category</span>
-              <span class="project-fact-value">{project.category}</span>
-            </div>
-          )}
-          <a href={contactUrl()} class="btn btn-primary" style="width:100%; justify-content:center; margin-top:var(--space-5);">
+          <a href={contactUrl()} class="btn btn-primary btn-block project-facts-cta">
             Start a Similar Project
           </a>
         </aside>
@@ -87,17 +88,62 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     </div>
   </div>
 
-  <!-- Project images -->
+  <!-- Project gallery -->
   {project.images.length > 0 && (
-    <section class="section-sm project-images">
+    <section class="project-gallery">
       <div class="container">
-        <div class="project-images-grid">
+
+        <!-- Main stage -->
+        <div class="gallery-stage" id="gallery-stage">
           {project.images.map((img, i) => (
-            <div class:list={['project-image-item', { 'project-image-item--featured': i === 0 }]}>
-              <img src={img} alt={`${project.title} — photo ${i + 1}`} loading={i === 0 ? 'eager' : 'lazy'} width="800" height="600" />
+            <div class:list={['gallery-slide', { 'gallery-slide--active': i === 0 }]} data-index={i}>
+              <img
+                src={img}
+                alt={`${project.title} — photo ${i + 1} of ${project.images.length}`}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                width="1200"
+                height="800"
+              />
             </div>
           ))}
+
+          {project.images.length > 1 && (
+            <>
+              <button class="gallery-btn gallery-btn--prev" id="gallery-prev" aria-label="Previous image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+              <button class="gallery-btn gallery-btn--next" id="gallery-next" aria-label="Next image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+              <div class="gallery-counter" aria-live="polite">
+                <span id="gallery-current">1</span> / {project.images.length}
+              </div>
+            </>
+          )}
         </div>
+
+        <!-- Thumbnails -->
+        {project.images.length > 1 && (
+          <ul class="gallery-thumbs" id="gallery-thumbs" role="list">
+            {project.images.map((img, i) => (
+              <li>
+                <button
+                  class:list={['gallery-thumb', { 'gallery-thumb--active': i === 0 }]}
+                  data-index={i}
+                  aria-label={`View photo ${i + 1}`}
+                  aria-pressed={i === 0 ? 'true' : 'false'}
+                >
+                  <img src={img} alt="" loading="lazy" width="160" height="120" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
       </div>
     </section>
   )}
@@ -113,17 +159,28 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
   <!-- Testimonial -->
   {project.testimonial && (
-    <section class="section-sm project-testimonial-section">
+    <section class="project-testimonial-section">
       <div class="container">
-        <blockquote class="project-testimonial">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
-          </svg>
-          <p class="project-testimonial-text">{project.testimonial}</p>
+        <div class="pt-card">
+          <div class="pt-quote-mark" aria-hidden="true">&ldquo;</div>
+          <div class="pt-stars" aria-label="5 stars">
+            {[1,2,3,4,5].map(() => (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            ))}
+          </div>
+          <blockquote class="pt-text">{project.testimonial}</blockquote>
           {project.testimonialAuthor && (
-            <footer class="project-testimonial-author">— {project.testimonialAuthor}</footer>
+            <footer class="pt-footer">
+              <div class="pt-avatar" aria-hidden="true">{project.testimonialAuthor[0]}</div>
+              <div class="pt-meta">
+                <span class="pt-name">{project.testimonialAuthor}</span>
+                {project.location && <span class="pt-location">{project.location}</span>}
+              </div>
+            </footer>
           )}
-        </blockquote>
+        </div>
       </div>
     </section>
   )}
@@ -132,19 +189,51 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   {projects.filter(p => p.slug !== project.slug).length > 0 && (
     <section class="section more-projects">
       <div class="container">
-        <h2 class="more-projects-title">More Projects</h2>
+        <p class="section-eyebrow">Portfolio</p>
+        <h2 class="more-projects-heading">More Projects</h2>
         <ul class="more-projects-grid" role="list">
-          {projects.filter(p => p.slug !== project.slug).slice(0, 3).map(p => (
+          {projects
+            .filter(p => p.slug !== project.slug)
+            .sort((a, b) => (b.category === project.category ? 1 : 0) - (a.category === project.category ? 1 : 0))
+            .slice(0, 3)
+            .map(p => (
             <li>
               <a href={`/projects/${p.slug}/`} class="more-project-card">
-                {p.images[0] && (
-                  <div class="more-project-image">
-                    <img src={p.images[0]} alt={p.title} loading="lazy" width="400" height="300" />
+                <div class="more-project-image">
+                  {p.images[0]
+                    ? <img src={p.images[0]} alt={p.title} loading="lazy" width="600" height="400" />
+                    : (
+                      <div class="more-project-placeholder" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <rect x="3" y="3" width="18" height="18" rx="2"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                      </div>
+                    )
+                  }
+                  <div class="more-project-overlay">
+                    <span class="more-project-view">
+                      View Project
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                      </svg>
+                    </span>
                   </div>
-                )}
+                </div>
                 <div class="more-project-body">
                   <p class="more-project-category">{p.category}</p>
                   <h3 class="more-project-title">{p.title}</h3>
+                  {p.location && (
+                    <p class="more-project-location">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      {p.location}
+                    </p>
+                  )}
                 </div>
               </a>
             </li>
@@ -154,10 +243,49 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     </section>
   )}
 
+  <script>
+    const slides   = document.querySelectorAll<HTMLElement>('.gallery-slide');
+    const thumbs   = document.querySelectorAll<HTMLButtonElement>('.gallery-thumb');
+    const counter  = document.getElementById('gallery-current');
+    const prevBtn  = document.getElementById('gallery-prev');
+    const nextBtn  = document.getElementById('gallery-next');
+
+    if (slides.length > 1) {
+      let current = 0;
+
+      function goTo(index: number) {
+        slides[current].classList.remove('gallery-slide--active');
+        thumbs[current]?.classList.remove('gallery-thumb--active');
+        thumbs[current]?.setAttribute('aria-pressed', 'false');
+
+        current = (index + slides.length) % slides.length;
+
+        slides[current].classList.add('gallery-slide--active');
+        thumbs[current]?.classList.add('gallery-thumb--active');
+        thumbs[current]?.setAttribute('aria-pressed', 'true');
+        thumbs[current]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+
+        if (counter) counter.textContent = String(current + 1);
+      }
+
+      prevBtn?.addEventListener('click', () => goTo(current - 1));
+      nextBtn?.addEventListener('click', () => goTo(current + 1));
+
+      thumbs.forEach((thumb, i) => {
+        thumb.addEventListener('click', () => goTo(i));
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') goTo(current - 1);
+        if (e.key === 'ArrowRight') goTo(current + 1);
+      });
+    }
+  </script>
+
   <CtaBanner
     headline="Ready to Start Your Project?"
     subheadline={`Get your free estimate from ${business.name} today.`}
-    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
     variant="brand"
@@ -174,44 +302,247 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   .project-header-grid { display: grid; gap: var(--space-10); grid-template-columns: 1fr; }
   @media (min-width: 1024px) { .project-header-grid { grid-template-columns: 1fr 280px; align-items: start; } }
 
-  .project-category-label { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-brand-600); margin: 0 0 var(--space-3); }
+  .project-category-label { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-accent-500); margin: 0 0 var(--space-3); }
 
   .project-title { font-family: var(--font-display); font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl)); font-weight: 800; line-height: 1.1; margin: 0 0 var(--space-4); }
 
   .project-desc { font-size: var(--text-lg); color: var(--color-text-muted); line-height: 1.7; margin: 0; max-width: 600px; }
 
-  .project-facts { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-6); }
+  .project-facts { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-6); transition: border-color var(--transition-base); }
+  .project-facts:hover { border-color: var(--color-accent-500); }
+
+  .project-facts-header { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-subtle); margin: 0 0 var(--space-4); }
+
+  .project-facts-cta { margin-top: var(--space-5); }
 
   .project-fact { display: flex; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-3); border-bottom: 1px solid var(--color-border); font-size: var(--text-sm); }
   .project-fact:last-of-type { border-bottom: none; }
   .project-fact-label { color: var(--color-text-muted); }
   .project-fact-value { font-weight: 600; }
 
-  .project-images-grid { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
-  @media (min-width: 640px) { .project-images-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1024px) { .project-images-grid { grid-template-columns: repeat(3, 1fr); } }
+  /* ── Gallery ──────────────────────────────────────────────────────────────── */
+  .project-gallery { padding: var(--space-10) 0 var(--space-12); }
 
-  .project-image-item { border-radius: var(--radius-xl); overflow: hidden; aspect-ratio: 4/3; }
-  .project-image-item--featured { grid-column: 1 / -1; aspect-ratio: 16/7; }
-  .project-image-item img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery-stage {
+    position: relative;
+    background: var(--color-neutral-950);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+  }
 
-  .project-testimonial-section { background: var(--color-brand-50); border-block: 1px solid var(--color-brand-100); }
+  .gallery-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
 
-  .project-testimonial { max-width: 700px; margin-inline: auto; text-align: center; }
-  .project-testimonial svg { color: var(--color-brand-200); margin-bottom: var(--space-4); }
-  .project-testimonial-text { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 500; font-style: italic; color: var(--color-brand-900); line-height: 1.5; margin: 0 0 var(--space-4); }
-  .project-testimonial-author { font-size: var(--text-sm); font-weight: 600; color: var(--color-brand-700); }
+  .gallery-slide--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-  .more-projects-title { font-family: var(--font-body); font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-muted); margin: 0 0 var(--space-6); }
+  .gallery-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .gallery-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-full);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .gallery-btn:hover { background: rgba(0, 0, 0, 0.8); }
+  .gallery-btn--prev { left: var(--space-4); }
+  .gallery-btn--next { right: var(--space-4); }
+
+  .gallery-counter {
+    position: absolute;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    background: rgba(0, 0, 0, 0.55);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    letter-spacing: 0.05em;
+  }
+
+  .gallery-thumbs {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 0;
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gallery-thumbs::-webkit-scrollbar { display: none; }
+
+  .gallery-thumb {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    padding: 0;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s ease, opacity 0.15s ease;
+    opacity: 0.55;
+  }
+
+  .gallery-thumb--active {
+    border-color: var(--color-accent-500);
+    opacity: 1;
+  }
+
+  .gallery-thumb:hover { opacity: 0.85; }
+
+  .gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  /* ── Testimonial ─────────────────────────────────────────────────────────── */
+  .project-testimonial-section {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-16) 0;
+  }
+
+  .pt-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-6);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-10) var(--space-12);
+    overflow: hidden;
+    transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+  }
+
+  .pt-card:hover {
+    box-shadow: 0 8px 32px rgb(0 0 0 / 0.08);
+    border-color: var(--color-accent-500);
+    transform: translateY(-2px);
+  }
+
+  .pt-quote-mark {
+    position: absolute;
+    bottom: calc(-1 * var(--space-6));
+    right: var(--space-8);
+    font-family: var(--font-display);
+    font-size: 14rem;
+    line-height: 1;
+    color: var(--color-accent-500);
+    opacity: 0.05;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .pt-stars {
+    display: flex;
+    gap: 3px;
+    color: var(--color-accent-500);
+  }
+
+  .pt-text {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    color: var(--color-text);
+    line-height: 1.4;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pt-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    position: relative;
+    z-index: 1;
+  }
+
+  .pt-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-brand-950);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    font-family: var(--font-display);
+  }
+
+  .pt-meta { display: flex; flex-direction: column; gap: 2px; }
+  .pt-name { font-weight: 700; font-size: var(--text-sm); color: var(--color-text); }
+  .pt-location { font-size: var(--text-xs); color: var(--color-text-subtle); letter-spacing: 0.02em; }
+
+
+  .more-projects-heading {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
+    font-weight: 700;
+    color: var(--color-text);
+    margin: var(--space-1) 0 var(--space-8);
+    line-height: 1.2;
+  }
 
   .more-projects-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 
-  .more-project-card { display: block; text-decoration: none; border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--color-border); transition: box-shadow var(--transition-base), transform var(--transition-base); }
-  .more-project-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
-  .more-project-image { aspect-ratio: 4/3; overflow: hidden; }
-  .more-project-image img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-slow); }
-  .more-project-card:hover .more-project-image img { transform: scale(1.04); }
+  .more-project-card { display: block; text-decoration: none; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base); }
+  .more-project-card:hover { box-shadow: 0 12px 40px rgb(0 0 0 / 0.12); transform: translateY(-4px); border-color: var(--color-accent-500); }
+
+  .more-project-image { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--color-brand-950); }
+  .more-project-image img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-slow); display: block; }
+  .more-project-card:hover .more-project-image img { transform: scale(1.05); }
+
+  .more-project-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); }
+
+  .more-project-overlay { position: absolute; inset: 0; background: color-mix(in srgb, var(--color-brand-950) 75%, transparent); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-base); }
+  .more-project-card:hover .more-project-overlay { opacity: 1; }
+
+  .more-project-view { display: flex; align-items: center; gap: var(--space-2); color: #ffffff; font-weight: 700; font-size: var(--text-sm); letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid var(--color-accent-500); padding-bottom: 2px; }
+
   .more-project-body { padding: var(--space-4) var(--space-5); background: var(--color-bg); }
-  .more-project-category { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-brand-600); margin: 0 0 var(--space-1); }
-  .more-project-title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700; margin: 0; }
+  .more-project-category { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-accent-500); margin: 0 0 var(--space-1); }
+  .more-project-title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700; color: var(--color-text); margin: 0 0 var(--space-2); line-height: 1.2; }
+  .more-project-location { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--color-text-subtle); margin: 0; }
 </style>

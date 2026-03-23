@@ -10,25 +10,33 @@ interface Props {
   services: Service[];
   title?: string;
   currentSlug?: string;
+  areaSlug?: string;
 }
 
-const { services, title = 'Related Services', currentSlug } = Astro.props;
+const { services, title = 'Related Services', currentSlug, areaSlug } = Astro.props;
 const filtered = services.filter(s => s.slug !== currentSlug).slice(0, 6);
 ---
 
 {filtered.length > 0 && (
-  <aside class="related-services section-sm">
+  <aside class="related-services section">
     <div class="container">
-      <h2 class="related-services-title">{title}</h2>
-      <ul class="related-services-list" role="list">
+      <header class="related-services-header">
+        <p class="section-eyebrow">What Else We Do</p>
+        <h2 class="section-title">{title}</h2>
+      </header>
+      <ul class="related-services-grid" role="list">
         {filtered.map(service => (
           <li>
-            <a href={`/services/${service.slug}/`} class="related-service-link">
+            <a href={areaSlug ? `/services/${areaSlug}/${service.slug}/` : `/services/${service.slug}/`} class="related-service-card">
               <span class="related-service-name">{service.name}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
+              <p class="related-service-desc">{service.shortDescription}</p>
+              <span class="related-service-cta" aria-hidden="true">
+                Learn More
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </span>
             </a>
           </li>
         ))}
@@ -39,46 +47,79 @@ const filtered = services.filter(s => s.slug !== currentSlug).slice(0, 6);
 
 <style>
   .related-services {
-    border-top: 1px solid var(--color-border);
     background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
   }
 
-  .related-services-title {
-    font-family: var(--font-body);
-    font-size: var(--text-sm);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-4);
+  .related-services-header {
+    margin-bottom: var(--space-10);
   }
 
-  .related-services-list {
+  .related-services-grid {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 
-  .related-service-link {
+  @media (min-width: 640px) {
+    .related-services-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .related-services-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .related-service-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-6);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .related-service-card:hover {
+    border-color: var(--color-accent-500);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .related-service-name {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+
+  .related-service-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+  }
+
+  .related-service-cta {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-brand-700);
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-200);
-    border-radius: var(--radius-full);
-    text-decoration: none;
-    transition: all var(--transition-fast);
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent-500);
+    margin-top: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+    transition: gap 0.15s ease;
+    letter-spacing: 0.01em;
   }
 
-  .related-service-link:hover {
-    background: var(--color-brand-100);
-    border-color: var(--color-brand-400);
-  }
+  .related-service-card:hover .related-service-cta { gap: var(--space-2); }
+
 </style>

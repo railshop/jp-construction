@@ -5,4 +5,4 @@ Allow: /
 Disallow: /lp/
 
 # Sitemap location — update SITE_URL before deploy
-Sitemap: https://example.com/sitemap-index.xml
+Sitemap: https://buildwithjp.com/sitemap-index.xml

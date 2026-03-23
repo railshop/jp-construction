@@ -10,7 +10,7 @@ import FaqAccordion from '../../components/blocks/FaqAccordion.astro';
 import CtaBanner from '../../components/blocks/CtaBanner.astro';
 import RelatedServices from '../../components/blocks/RelatedServices.astro';
 import { getBusiness, getServiceAreas, getServices, getTestimonials, getFaqs } from '../../lib/data';
-import config from '../../site.config';
+import config from '@/site.config';
 
 export async function getStaticPaths() {
   const areas = await getServiceAreas();
@@ -24,10 +24,10 @@ const services     = await getServices();
 const testimonials = await getTestimonials();
 const faqs         = await getFaqs();
 
-const area         = areas.find(a => a.slug === areaSlug)!;
-const nearbyAreas  = area.nearby
-  ? areas.filter(a => (area.nearby as string[]).includes(a.slug))
-  : [];
+const area           = areas.find(a => a.slug === areaSlug)!;
+const otherAreas     = areas.filter(a => a.slug !== areaSlug);
+const primaryAreas   = otherAreas.filter(a => a.priority === 'primary');
+const secondaryAreas = otherAreas.filter(a => a.priority === 'secondary');
 
 const areaTestimonials = testimonials.filter(t =>
   !t.area || (t.area as unknown as string) === areaSlug
@@ -70,52 +70,15 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
         <span aria-current="page">{area.name}</span>
       </nav>
 
-      <div class="area-hero-grid">
-        <div class="area-hero-content">
-          <p class="section-eyebrow">{area.county || 'Service Area'}</p>
-          <h1 class="area-hero-title">
-            {business.name} Serving {area.name}
-          </h1>
-          {area.description && (
-            <p class="area-hero-desc">{area.description}</p>
-          )}
-          <div class="area-hero-actions">
-            <a href={contactUrl()} class="btn btn-primary btn-lg">Get a Free Quote</a>
-            <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
-          </div>
-        </div>
+      <p class="section-eyebrow">{area.county || 'Service Area'}</p>
+      <h1 class="area-hero-title">Construction Services in {area.name}, {business.address.state}</h1>
+      {area.description && (
+        <p class="area-hero-desc">{area.description}</p>
+      )}
 
-        <!-- Area quick facts -->
-        <aside class="area-facts-card">
-          <h2 class="area-facts-title">Area Details</h2>
-          {area.responseTime && (
-            <div class="area-fact">
-              <span class="area-fact-label">Response Time</span>
-              <span class="area-fact-value area-fact-value--highlight">{area.responseTime}</span>
-            </div>
-          )}
-          {area.county && (
-            <div class="area-fact">
-              <span class="area-fact-label">County</span>
-              <span class="area-fact-value">{area.county}</span>
-            </div>
-          )}
-          {area.population && (
-            <div class="area-fact">
-              <span class="area-fact-label">Population</span>
-              <span class="area-fact-value">{area.population.toLocaleString()}</span>
-            </div>
-          )}
-          {area.zipCodes && area.zipCodes.length > 0 && (
-            <div class="area-fact">
-              <span class="area-fact-label">ZIP Codes</span>
-              <span class="area-fact-value">{area.zipCodes.join(', ')}</span>
-            </div>
-          )}
-          <a href={contactUrl()} class="btn btn-primary" style="width:100%; justify-content:center; margin-top:var(--space-5);">
-            Schedule Service
-          </a>
-        </aside>
+      <div class="area-hero-actions">
+        <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
+        <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
       </div>
     </div>
   </div>
@@ -126,7 +89,19 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     eyebrow={`Services in ${area.name}`}
     title={`What We Offer in ${area.name}`}
     subtitle={`The full range of ${business.name} services, available to homes and businesses in ${area.name}.`}
+    areaSlug={areaSlug}
+    showViewAll={false}
   />
+
+  <!-- FAQ -->
+  {faqs.length > 0 && (
+    <FaqAccordion
+      faqs={faqs}
+      eyebrow="FAQ"
+      title={`Common Questions from ${area.name} Customers`}
+      variant="dark"
+    />
+  )}
 
   <!-- Testimonials -->
   {areaTestimonials.length > 0 && (
@@ -138,26 +113,41 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     />
   )}
 
-  <!-- FAQ -->
-  {faqs.length > 0 && (
-    <FaqAccordion
-      faqs={faqs}
-      eyebrow="FAQ"
-      title={`Common Questions from ${area.name} Customers`}
-    />
-  )}
-
-  <!-- Nearby areas -->
-  {nearbyAreas.length > 0 && (
-    <section class="section-sm nearby-section">
+  <!-- Other service areas -->
+  {otherAreas.length > 0 && (
+    <section class="nearby-section">
       <div class="container">
-        <h2 class="nearby-title">Nearby Service Areas</h2>
-        <ul class="nearby-list" role="list">
-          {nearbyAreas.map(nearby => (
+        <div class="nearby-header">
+          <div>
+            <p class="section-eyebrow">Where We Work</p>
+            <h2 class="nearby-title">Other Areas We Serve</h2>
+          </div>
+          <a href="/areas/" class="nearby-all-link">
+            View all areas
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </a>
+        </div>
+
+        <ul class="nearby-grid" role="list">
+          {primaryAreas.map(nearby => (
             <li>
-              <a href={`/areas/${nearby.slug}/`} class="nearby-link">
-                {nearby.name}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <a href={`/areas/${nearby.slug}/`} class="nearby-card nearby-card--primary">
+                <div class="nearby-card-body">
+                  <span class="nearby-card-name">{nearby.name}</span>
+                  {nearby.responseTime && (
+                    <span class="nearby-card-response">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      {nearby.responseTime}
+                    </span>
+                  )}
+                </div>
+                <svg class="nearby-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <line x1="5" y1="12" x2="19" y2="12"/>
                   <polyline points="12 5 19 12 12 19"/>
                 </svg>
@@ -165,6 +155,19 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
             </li>
           ))}
         </ul>
+
+        {secondaryAreas.length > 0 && (
+          <div class="nearby-secondary-row">
+            <span class="nearby-secondary-label">Also serving:</span>
+            <ul class="nearby-pills" role="list">
+              {secondaryAreas.map(nearby => (
+                <li>
+                  <a href={`/areas/${nearby.slug}/`} class="nearby-pill">{nearby.name}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </section>
   )}
@@ -172,7 +175,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   <CtaBanner
     headline={`Need Service in ${area.name}?`}
     subheadline={`We're ${area.responseTime ? area.responseTime + ' away' : 'nearby'}. Call or request a free quote online.`}
-    primaryCta={{ label: 'Get a Free Quote', href: '/contact/' }}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
     variant="brand"
@@ -180,9 +183,10 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 </BaseLayout>
 
 <style>
+  /* ── Hero ─────────────────────────────────────────────────────────────────── */
   .area-hero {
-    background: var(--color-neutral-900);
-    padding: var(--space-10) 0 var(--space-12);
+    padding: var(--space-24) 0 var(--space-20);
+    background: linear-gradient(160deg, var(--color-brand-900) 0%, var(--color-brand-950) 100%);
   }
 
   .breadcrumb {
@@ -190,110 +194,186 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     align-items: center;
     gap: var(--space-2);
     font-size: var(--text-sm);
-    color: var(--color-neutral-500);
+    color: var(--color-neutral-400);
     margin-bottom: var(--space-8);
+    flex-wrap: wrap;
   }
 
   .breadcrumb a { color: var(--color-neutral-400); text-decoration: none; }
   .breadcrumb a:hover { color: #ffffff; }
+  .breadcrumb span[aria-hidden] { color: var(--color-neutral-600); }
 
-  .area-hero-grid {
-    display: grid;
-    gap: var(--space-10);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 1024px) {
-    .area-hero-grid { grid-template-columns: 1fr 300px; align-items: start; }
-  }
+  .area-hero .section-eyebrow { color: var(--color-accent-500); }
 
   .area-hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
-    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
     color: #ffffff;
-    margin: var(--space-3) 0 var(--space-4);
-    line-height: 1.1;
+    margin: var(--space-2) 0 var(--space-4);
+    max-width: 900px;
   }
 
   .area-hero-desc {
     font-size: var(--text-lg);
-    color: var(--color-neutral-300);
-    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.6;
     margin: 0 0 var(--space-6);
-    max-width: 560px;
+    max-width: 640px;
   }
 
-  .area-hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
-  .area-hero-actions .btn-ghost { color: #ffffff; border-color: var(--color-neutral-500); }
+  .area-hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-8); }
 
-  .area-facts-card {
-    background: var(--color-bg);
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
-    box-shadow: var(--shadow-xl);
+  .area-hero-actions .btn-ghost {
+    color: #ffffff;
+    border-color: var(--color-neutral-500);
   }
 
-  .area-facts-title {
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-5);
+  .area-hero-actions .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-neutral-300);
   }
 
-  .area-fact {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--space-4);
-    padding-block: var(--space-3);
+  /* ── Other areas ──────────────────────────────────────────────────────────── */
+  .nearby-section {
+    padding: var(--space-16) 0;
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
-    font-size: var(--text-sm);
   }
 
-  .area-fact:last-of-type { border-bottom: none; }
-  .area-fact-label { color: var(--color-text-muted); }
-  .area-fact-value { font-weight: 600; color: var(--color-text); text-align: right; }
-  .area-fact-value--highlight { color: var(--color-brand-700); }
-
-  .nearby-section { border-top: 1px solid var(--color-border); background: var(--color-bg-subtle); }
+  .nearby-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
 
   .nearby-title {
-    font-family: var(--font-body);
-    font-size: var(--text-xs);
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-3xl));
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-4);
+    color: var(--color-text);
+    margin: var(--space-1) 0 0;
+    line-height: 1.2;
   }
 
-  .nearby-list {
+  .nearby-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent-500);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: gap 0.15s ease;
+  }
+
+  .nearby-all-link:hover { gap: var(--space-2); }
+
+  .nearby-grid {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 640px)  { .nearby-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1024px) { .nearby-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .nearby-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .nearby-card:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateX(3px);
+  }
+
+  .nearby-card--primary { border-left: 3px solid var(--color-accent-500); }
+
+  .nearby-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .nearby-card-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+  }
+
+  .nearby-card-response {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .nearby-card-arrow {
+    flex-shrink: 0;
+    color: var(--color-text-subtle);
+    transition: color 0.15s ease, transform 0.15s ease;
+  }
+
+  .nearby-card:hover .nearby-card-arrow {
+    color: var(--color-brand-600);
+    transform: translateX(2px);
+  }
+
+  .nearby-secondary-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .nearby-secondary-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .nearby-pills {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .nearby-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-brand-700);
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-200);
+  .nearby-pill {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
     text-decoration: none;
-    transition: all var(--transition-fast);
+    transition: border-color 0.15s ease, color 0.15s ease;
   }
 
-  .nearby-link:hover { background: var(--color-brand-100); border-color: var(--color-brand-400); }
+  .nearby-pill:hover {
+    border-color: var(--color-brand-300);
+    color: var(--color-brand-700);
+  }
 </style>

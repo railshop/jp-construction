@@ -1,55 +1,127 @@
 ---
 /**
  * Header.astro
- * Sticky header with desktop nav, mobile drawer, and phone CTA.
- * Logo text and nav links are driven by site.config.ts and data layer.
+ * Sticky header with desktop nav (dropdowns for Services + Areas), mobile drawer, and phone CTA.
  */
 
-import config from '../../site.config';
-import { getBusiness } from '../../lib/data';
+import config from '@/site.config';
+import { getBusiness, getServices, getServiceAreas } from '../../lib/data';
+import { homeUrl, contactUrl, serviceUrl, areaUrl, servicesUrl, areasUrl } from '../../lib/urls';
 
-const business = await getBusiness();
+const business     = await getBusiness();
+const services     = await getServices();
+const areas        = config.features.serviceAreas ? await getServiceAreas() : [];
+
 const currentPath = Astro.url.pathname;
 
+// Only primary/secondary areas in the dropdown (cap at 10 to keep it manageable)
+const dropdownAreas = areas
+  .filter(a => a.priority === 'primary' || a.priority === 'secondary')
+  .slice(0, 10);
+
 const navLinks = [
-  { label: 'Services', href: '/services/' },
-  ...(config.features.serviceAreas ? [{ label: 'Service Areas', href: '/areas/' }] : []),
-  ...(config.features.projects     ? [{ label: 'Projects', href: '/projects/' }] : []),
-  ...(config.features.blog         ? [{ label: 'Blog', href: '/blog/' }] : []),
-  { label: 'About', href: '/about/' },
-  { label: 'Contact', href: '/contact/' },
+  { label: 'Services',      href: servicesUrl(),  hasDropdown: true,  dropdownId: 'dd-services' },
+  ...(config.features.serviceAreas ? [{ label: 'Service Areas', href: areasUrl(), hasDropdown: true, dropdownId: 'dd-areas' }] : []),
+  ...(config.features.projects     ? [{ label: 'Projects',      href: '/projects/', hasDropdown: false, dropdownId: '' }] : []),
+  ...(config.features.blog         ? [{ label: 'Blog',          href: '/blog/',     hasDropdown: false, dropdownId: '' }] : []),
+  { label: 'About',   href: '/about/',   hasDropdown: false, dropdownId: '' },
+  { label: 'Contact', href: '/contact/', hasDropdown: false, dropdownId: '' },
 ];
-import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl } from '../../lib/urls';
 ---
 
 <header class="site-header" id="site-header">
+  <div class="header-accent-line"></div>
   <div class="container">
     <nav class="header-nav" aria-label="Main navigation">
 
       <!-- Logo -->
       <a href={homeUrl()} class="header-logo" aria-label={`${business.name} — Home`}>
-        <span class="logo-primary">{business.name.split(' ').slice(0, -1).join(' ')}</span>
-        <span class="logo-accent">{business.name.split(' ').slice(-1)}</span>
+        <img
+          src="/JP%20Construction%20Dark%20Trimmed.svg"
+          alt={business.name}
+          class="logo-img"
+          width="206"
+          height="40"
+          loading="eager"
+        />
       </a>
 
       <!-- Desktop Nav -->
       <ul class="desktop-nav" role="list">
         {navLinks.map(link => (
-          <li>
-            <a
-              href={link.href}
-              class:list={['nav-link', { 'nav-link--active': currentPath.startsWith(link.href) }]}
-            >
-              {link.label}
-            </a>
+          <li class:list={['nav-item', { 'has-dropdown': link.hasDropdown }]}>
+            {link.hasDropdown ? (
+              <button
+                class:list={['nav-link nav-link--btn', { 'nav-link--active': currentPath.startsWith(link.href) }]}
+                aria-expanded="false"
+                aria-controls={link.dropdownId}
+                aria-haspopup="true"
+                data-dropdown-trigger={link.dropdownId}
+              >
+                {link.label}
+                <svg class="nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+            ) : (
+              <a
+                href={link.href}
+                class:list={['nav-link', { 'nav-link--active': currentPath.startsWith(link.href) }]}
+              >
+                {link.label}
+              </a>
+            )}
+
+            {/* Services Dropdown */}
+            {link.dropdownId === 'dd-services' && (
+              <div class="nav-dropdown" id="dd-services" role="region" aria-label="Services menu">
+                <div class="dropdown-inner">
+                  <div class="dropdown-header">
+                    <span class="dropdown-eyebrow">Our Services</span>
+                    <a href={servicesUrl()} class="dropdown-view-all">View All →</a>
+                  </div>
+                  <ul class="dropdown-list" role="list">
+                    {services.map(service => (
+                      <li>
+                        <a href={serviceUrl(service.slug)} class="dropdown-item">
+                          <span class="dropdown-item-name">{service.name}</span>
+                          <span class="dropdown-item-desc">{service.shortDescription}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Areas Dropdown */}
+            {link.dropdownId === 'dd-areas' && dropdownAreas.length > 0 && (
+              <div class="nav-dropdown nav-dropdown--areas" id="dd-areas" role="region" aria-label="Service areas menu">
+                <div class="dropdown-inner">
+                  <div class="dropdown-header">
+                    <span class="dropdown-eyebrow">Service Areas</span>
+                    <a href={areasUrl()} class="dropdown-view-all">View All →</a>
+                  </div>
+                  <ul class="dropdown-list dropdown-list--grid" role="list">
+                    {dropdownAreas.map(area => (
+                      <li>
+                        <a href={areaUrl(area.slug)} class="dropdown-item dropdown-item--compact">
+                          <span class="dropdown-item-name">{area.name}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </li>
         ))}
       </ul>
 
       <!-- Desktop CTA -->
       <div class="header-cta">
-        <a href={business.phoneHref} class="btn btn-primary btn-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <a href={business.phoneHref} class="btn-call">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.77 3.44 2 2 0 0 1 3.74 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
           </svg>
           {business.phone}
@@ -75,33 +147,113 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 <!-- Mobile Drawer -->
 <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true" role="dialog" aria-label="Navigation menu">
   <div class="mobile-drawer-inner">
-    <button
-      class="mobile-drawer-close"
-      id="mobile-drawer-close"
-      aria-label="Close navigation menu"
-    >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
+
+    <div class="mobile-drawer-header">
+      <img src="/JP%20Construction%20Dark%20Trimmed.svg" alt={business.name} class="drawer-logo" width="160" height="32" loading="lazy" />
+      <button
+        class="mobile-drawer-close"
+        id="mobile-drawer-close"
+        aria-label="Close navigation menu"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
 
     <nav aria-label="Mobile navigation">
       <ul role="list" class="mobile-nav-list">
-        {navLinks.map(link => (
-          <li>
-            <a href={link.href} class="mobile-nav-link">{link.label}</a>
+
+        <!-- Services with sub-items -->
+        <li class="mobile-nav-section">
+          <a href={servicesUrl()} class:list={['mobile-nav-link mobile-nav-link--parent', { 'mobile-nav-link--active': currentPath.startsWith(servicesUrl()) }]}>
+            Services
+            <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+          {services.length > 0 && (
+            <ul class="mobile-sub-list" role="list">
+              {services.map(service => (
+                <li>
+                  <a href={serviceUrl(service.slug)} class="mobile-sub-link">{service.name}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+
+        <!-- Service Areas with sub-items -->
+        {config.features.serviceAreas && dropdownAreas.length > 0 && (
+          <li class="mobile-nav-section">
+            <a href={areasUrl()} class:list={['mobile-nav-link mobile-nav-link--parent', { 'mobile-nav-link--active': currentPath.startsWith(areasUrl()) }]}>
+              Service Areas
+              <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </a>
+            <ul class="mobile-sub-list" role="list">
+              {dropdownAreas.map(area => (
+                <li>
+                  <a href={areaUrl(area.slug)} class="mobile-sub-link">{area.name}</a>
+                </li>
+              ))}
+            </ul>
           </li>
-        ))}
+        )}
+
+        {config.features.projects && (
+          <li>
+            <a href="/projects/" class:list={['mobile-nav-link', { 'mobile-nav-link--active': currentPath.startsWith('/projects/') }]}>
+              Projects
+              <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </a>
+          </li>
+        )}
+
+        {config.features.blog && (
+          <li>
+            <a href="/blog/" class:list={['mobile-nav-link', { 'mobile-nav-link--active': currentPath.startsWith('/blog/') }]}>
+              Blog
+              <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </a>
+          </li>
+        )}
+
+        <li>
+          <a href="/about/" class:list={['mobile-nav-link', { 'mobile-nav-link--active': currentPath === '/about/' }]}>
+            About
+            <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+        </li>
+
+        <li>
+          <a href="/contact/" class:list={['mobile-nav-link', { 'mobile-nav-link--active': currentPath === '/contact/' }]}>
+            Contact
+            <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+        </li>
       </ul>
     </nav>
 
     <div class="mobile-drawer-cta">
-      <a href={business.phoneHref} class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;">
-        Call {business.phone}
+      <a href={business.phoneHref} class="drawer-btn-call">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.77 3.44 2 2 0 0 1 3.74 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        {business.phone}
       </a>
-      <a href={contactUrl()} class="btn btn-ghost btn-lg" style="width: 100%; justify-content: center;">
-        Get a Free Quote
+      <a href={contactUrl()} class="btn btn-secondary" style="width: 100%; justify-content: center; padding-block: var(--space-4);">
+        Get an Estimate
       </a>
     </div>
   </div>
@@ -111,143 +263,437 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 <div class="mobile-overlay" id="mobile-overlay" aria-hidden="true"></div>
 
 <style>
+  /* ─── Header shell ───────────────────────────────────────────────────────── */
+
   .site-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 100;
-    height: var(--header-height);
-    background: var(--color-bg);
+    z-index: 1100;
+    background: #ffffff;
     border-bottom: 1px solid var(--color-border);
-    transition: box-shadow var(--transition-fast);
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  /* Thin red accent line at very top */
+  .header-accent-line {
+    height: 3px;
+    background: var(--color-accent-500);
+    width: 100%;
   }
 
   .site-header.scrolled {
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 2px 20px rgb(0 0 0 / 0.08);
+    border-color: var(--color-border-strong);
   }
+
+  /* ─── Nav layout ─────────────────────────────────────────────────────────── */
 
   .header-nav {
     display: flex;
     align-items: center;
     gap: var(--space-8);
-    height: var(--header-height);
+    height: calc(var(--header-height) - 3px);
   }
+
+  /* ─── Logo ───────────────────────────────────────────────────────────────── */
 
   .header-logo {
     display: flex;
-    align-items: baseline;
-    gap: var(--space-1);
-    font-family: var(--font-display);
-    font-size: var(--text-xl);
-    font-weight: 700;
-    text-decoration: none;
+    align-items: center;
     flex-shrink: 0;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
   }
 
-  .logo-primary { color: var(--color-text); }
-  .logo-accent  { color: var(--color-brand-600); }
+  .header-logo:hover { opacity: 0.85; }
+
+  .logo-img {
+    height: 54px;
+    width: auto;
+    display: block;
+  }
+
+  @media (max-width: 1023px) {
+    .logo-img { height: 44px; }
+  }
+
+  /* ─── Desktop nav ────────────────────────────────────────────────────────── */
 
   .desktop-nav {
     display: none;
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: var(--space-1);
+    gap: 0;
     flex: 1;
   }
 
-  @media (min-width: 1024px) {
-    .desktop-nav { display: flex; }
+  @media (min-width: 1024px) { .desktop-nav { display: flex; } }
+
+  /* ─── Nav item (wrapper for link + dropdown) ─────────────────────────────── */
+
+  .nav-item {
+    position: relative;
   }
 
   .nav-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
     padding: var(--space-2) var(--space-3);
+    font-family: var(--font-body);
     font-size: var(--text-sm);
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     color: var(--color-text-muted);
-    border-radius: var(--radius-md);
-    transition: color var(--transition-fast), background var(--transition-fast);
+    border-radius: var(--radius-sm);
     text-decoration: none;
+    transition: color var(--transition-fast), background var(--transition-fast);
+    position: relative;
+    white-space: nowrap;
   }
 
-  .nav-link:hover,
-  .nav-link--active {
-    color: var(--color-brand-700);
-    background: var(--color-brand-50);
+  /* Reset button styles for dropdown triggers */
+  .nav-link--btn {
+    background: none;
+    border: none;
+    cursor: pointer;
   }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: var(--space-3);
+    right: var(--space-3);
+    height: 2px;
+    background: var(--color-accent-500);
+    transform: scaleX(0);
+    transition: transform var(--transition-fast);
+    border-radius: 1px;
+  }
+
+  /* No underline on dropdown triggers — they open a panel, not a page */
+  .has-dropdown .nav-link::after { display: none; }
+
+  .nav-link:hover {
+    color: var(--color-text);
+    background: var(--color-neutral-50);
+  }
+
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  .nav-link--active {
+    color: var(--color-accent-500);
+    font-weight: 700;
+  }
+
+  .nav-link--active::after { transform: scaleX(1); }
+
+  .nav-chevron {
+    transition: transform var(--transition-fast);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* ─── Dropdown panel ─────────────────────────────────────────────────────── */
+
+  .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 320px;
+    padding-top: 8px; /* visual gap without breaking hover continuity */
+    background: transparent;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition:
+      opacity var(--transition-fast),
+      transform var(--transition-fast),
+      visibility var(--transition-fast);
+    z-index: 1200;
+    pointer-events: none;
+  }
+
+  .dropdown-inner {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 0.12), 0 4px 12px rgb(0 0 0 / 0.06);
+  }
+
+  .nav-dropdown--areas {
+    min-width: 280px;
+  }
+
+  /* Open state — hover (CSS) or click/keyboard (JS via .dropdown-open) */
+  .nav-item.has-dropdown:hover .nav-dropdown,
+  .nav-item.dropdown-open .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .nav-item.has-dropdown:hover .nav-chevron,
+  .nav-item.dropdown-open .nav-chevron {
+    transform: rotate(180deg);
+    opacity: 1;
+  }
+
+  .nav-item.has-dropdown:hover .nav-link,
+  .nav-item.dropdown-open .nav-link {
+    color: var(--color-text);
+    background: var(--color-neutral-50);
+  }
+
+  .dropdown-inner {
+    padding: var(--space-4);
+  }
+
+  .dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .dropdown-eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .dropdown-view-all {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent-500);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color var(--transition-fast);
+  }
+
+  .dropdown-view-all:hover { color: var(--color-accent-600); }
+
+  .dropdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .dropdown-list--grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .dropdown-item:hover {
+    background: var(--color-neutral-50);
+  }
+
+  .dropdown-item:hover .dropdown-item-name {
+    color: var(--color-accent-500);
+  }
+
+  .dropdown-item--compact {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .dropdown-item--compact .dropdown-item-name {
+    font-size: var(--text-sm);
+  }
+
+  .dropdown-item--compact .dropdown-item-desc {
+    font-size: 0.7rem;
+  }
+
+  .dropdown-item-name {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    transition: color var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .dropdown-item-desc {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    line-height: 1.4;
+  }
+
+  /* ─── Desktop CTA ────────────────────────────────────────────────────────── */
 
   .header-cta {
     display: none;
     margin-left: auto;
+    flex-shrink: 0;
   }
 
-  @media (min-width: 1024px) {
-    .header-cta { display: flex; }
+  @media (min-width: 1024px) { .header-cta { display: flex; } }
+
+  .btn-call {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.6rem var(--space-5);
+    background: var(--color-accent-500);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   }
 
-  /* Mobile toggle */
+  .btn-call:hover {
+    background: var(--color-accent-600);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(220 31 38 / 0.3);
+  }
+
+  .btn-call:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* ─── Mobile toggle ──────────────────────────────────────────────────────── */
+
   .mobile-menu-toggle {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: flex-start;
     gap: 5px;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     background: none;
     border: none;
     cursor: pointer;
     margin-left: auto;
-    padding: var(--space-1);
+    padding: 10px;
   }
 
-  @media (min-width: 1024px) {
-    .mobile-menu-toggle { display: none; }
-  }
+  @media (min-width: 1024px) { .mobile-menu-toggle { display: none; } }
 
   .toggle-bar {
     display: block;
-    width: 100%;
     height: 2px;
     background: var(--color-text);
     border-radius: 2px;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s ease,
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Mobile drawer */
+  /* Top and bottom bars: full width */
+  .toggle-bar:nth-child(1),
+  .toggle-bar:nth-child(3) { width: 20px; }
+
+  /* Middle bar: shorter */
+  .toggle-bar:nth-child(2) { width: 13px; }
+
+  /* Open state — top bar rotates down, middle fades, bottom rotates up */
+  .mobile-menu-toggle.is-open .toggle-bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+    width: 20px;
+  }
+
+  .mobile-menu-toggle.is-open .toggle-bar:nth-child(2) {
+    opacity: 0;
+    width: 0;
+  }
+
+  .mobile-menu-toggle.is-open .toggle-bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+    width: 20px;
+  }
+
+  /* ─── Mobile drawer ──────────────────────────────────────────────────────── */
+
   .mobile-drawer {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(360px, 90vw);
-    background: var(--color-bg);
-    z-index: 200;
+    width: min(340px, 90vw);
+    background: #ffffff;
+    z-index: 1200;
     transform: translateX(100%);
-    transition: transform var(--transition-base);
+    transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
+    border-left: 1px solid var(--color-border);
   }
 
-  .mobile-drawer.open {
-    transform: translateX(0);
-  }
+  .mobile-drawer.open { transform: translateX(0); }
 
   .mobile-drawer-inner {
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: var(--space-6);
     min-height: 100%;
   }
 
+  .mobile-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .drawer-logo {
+    height: 28px;
+    width: auto;
+    display: block;
+  }
+
   .mobile-drawer-close {
-    align-self: flex-end;
-    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--color-neutral-100);
     border: none;
+    border-radius: var(--radius-full);
     cursor: pointer;
     color: var(--color-text);
-    padding: var(--space-2);
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .mobile-drawer-close:hover {
+    background: var(--color-accent-500);
+    color: #ffffff;
   }
 
   .mobile-nav-list {
@@ -256,24 +702,80 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    border-top: 1px solid var(--color-border);
   }
 
   .mobile-nav-link {
-    display: block;
-    padding: var(--space-3) var(--space-4);
-    font-size: var(--text-lg);
-    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-2);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 600;
     color: var(--color-text);
-    border-radius: var(--radius-md);
     text-decoration: none;
-    transition: background var(--transition-fast), color var(--transition-fast);
+    border-bottom: 1px solid var(--color-border);
+    transition: color var(--transition-fast), padding-left var(--transition-fast);
   }
 
   .mobile-nav-link:hover {
-    background: var(--color-brand-50);
-    color: var(--color-brand-700);
+    color: var(--color-accent-500);
+    padding-left: var(--space-4);
   }
+
+  .mobile-nav-link--active { color: var(--color-accent-500); }
+
+  .mobile-nav-arrow {
+    flex-shrink: 0;
+    opacity: 0.4;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .mobile-nav-link:hover .mobile-nav-arrow,
+  .mobile-nav-link--active .mobile-nav-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+
+  /* Mobile sub-nav lists */
+  .mobile-nav-section {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-nav-section .mobile-nav-link {
+    border-bottom: none;
+  }
+
+  .mobile-sub-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--space-2) var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--color-neutral-50);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+  }
+
+  .mobile-sub-link {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast), padding-left var(--transition-fast);
+  }
+
+  .mobile-sub-link:hover {
+    color: var(--color-accent-500);
+    background: var(--color-neutral-100);
+    padding-left: var(--space-5);
+  }
+
 
   .mobile-drawer-cta {
     margin-top: auto;
@@ -282,14 +784,36 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     gap: var(--space-3);
   }
 
+  .drawer-btn-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-accent-500);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+  }
+
+  .drawer-btn-call:hover { background: var(--color-accent-600); }
+
+
+  /* ─── Overlay ────────────────────────────────────────────────────────────── */
+
   .mobile-overlay {
     position: fixed;
     inset: 0;
-    background: rgb(0 0 0 / 0.4);
+    background: rgb(0 0 0 / 0.45);
     z-index: 150;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--transition-base);
+    transition: opacity 320ms ease;
+    backdrop-filter: blur(2px);
   }
 
   .mobile-overlay.open {
@@ -299,6 +823,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 </style>
 
 <script>
+  // ─── Mobile drawer ──────────────────────────────────────────────────────────
   const toggle   = document.getElementById('mobile-menu-toggle')!;
   const drawer   = document.getElementById('mobile-drawer')!;
   const overlay  = document.getElementById('mobile-overlay')!;
@@ -308,6 +833,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   function openDrawer() {
     drawer.classList.add('open');
     overlay.classList.add('open');
+    toggle.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
     toggle.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
@@ -316,6 +842,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   function closeDrawer() {
     drawer.classList.remove('open');
     overlay.classList.remove('open');
+    toggle.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
     toggle.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
@@ -325,13 +852,62 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   closeBtn.addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
 
-  // Sticky shadow on scroll
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeDrawer();
+      closeAllDropdowns();
+    }
   });
 
-  // Close on escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeDrawer();
+  // ─── Desktop dropdowns ──────────────────────────────────────────────────────
+  function closeAllDropdowns() {
+    document.querySelectorAll('.nav-item.dropdown-open').forEach(item => {
+      item.classList.remove('dropdown-open');
+      const trigger = item.querySelector('[data-dropdown-trigger]') as HTMLElement | null;
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  // Toggle on button click (also works for keyboard)
+  document.querySelectorAll('[data-dropdown-trigger]').forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const navItem = (trigger as HTMLElement).closest('.nav-item')!;
+      const isOpen  = navItem.classList.contains('dropdown-open');
+
+      closeAllDropdowns();
+
+      if (!isOpen) {
+        navItem.classList.add('dropdown-open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('.has-dropdown')) {
+      closeAllDropdowns();
+    }
+  });
+
+  // Keyboard: close on Tab away from the dropdown
+  document.querySelectorAll('.nav-dropdown').forEach(dd => {
+    dd.addEventListener('keydown', (e) => {
+      const ke = e as KeyboardEvent;
+      if (ke.key === 'Tab') {
+        // small delay to let focus move first
+        setTimeout(() => {
+          const focused = document.activeElement;
+          if (!dd.contains(focused) && !dd.previousElementSibling?.contains(focused)) {
+            closeAllDropdowns();
+          }
+        }, 50);
+      }
+    });
   });
 </script>

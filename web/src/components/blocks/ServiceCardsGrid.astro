@@ -1,7 +1,7 @@
 ---
 /**
  * ServiceCardsGrid.astro
- * Grid of service cards. Accepts services from the data layer.
+ * Grid of service cards. Image placeholder shown when no image is set.
  */
 
 import type { Service } from '../../lib/data';
@@ -13,6 +13,8 @@ interface Props {
   subtitle?: string;
   columns?: 2 | 3 | 4;
   showPricing?: boolean;
+  showViewAll?: boolean;
+  areaSlug?: string;
 }
 
 const {
@@ -22,6 +24,8 @@ const {
   subtitle,
   columns = 3,
   showPricing = false,
+  showViewAll = true,
+  areaSlug,
 } = Astro.props;
 ---
 
@@ -42,22 +46,10 @@ const {
       {services.map((service, i) => (
         <li>
           <a
-            href={`/services/${service.slug}/`}
+            href={areaSlug ? `/services/${areaSlug}/${service.slug}/` : `/services/${service.slug}/`}
             class="service-card animate-fade-up"
             style={`animation-delay: ${i * 80}ms`}
           >
-            {service.image && (
-              <div class="service-card-image">
-                <img
-                  src={service.image}
-                  alt={service.name}
-                  loading="lazy"
-                  decoding="async"
-                  width="400"
-                  height="250"
-                />
-              </div>
-            )}
             <div class="service-card-body">
               <div class="service-card-header">
                 <h3 class="service-card-title">{service.name}</h3>
@@ -73,7 +65,7 @@ const {
               )}
               <span class="service-card-cta" aria-hidden="true">
                 Learn More
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="5" y1="12" x2="19" y2="12"/>
                   <polyline points="12 5 19 12 12 19"/>
                 </svg>
@@ -84,9 +76,11 @@ const {
       ))}
     </ul>
 
-    <div class="services-grid-cta">
-      <a href="/services/" class="btn btn-secondary">View All Services</a>
-    </div>
+    {showViewAll && (
+      <div class="services-grid-cta">
+        <a href="/services/" class="btn btn-secondary">View All Services</a>
+      </div>
+    )}
   </div>
 </section>
 
@@ -96,6 +90,10 @@ const {
     margin-bottom: var(--space-12);
     max-width: 640px;
     margin-inline: auto;
+  }
+
+  .section-header .section-eyebrow {
+    justify-content: center;
   }
 
   .section-header .section-subtitle {
@@ -128,7 +126,7 @@ const {
     height: 100%;
     background: var(--color-bg);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     text-decoration: none;
     transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base);
@@ -137,30 +135,14 @@ const {
   }
 
   .service-card:hover {
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.12);
     transform: translateY(-4px);
-    border-color: var(--color-brand-200);
+    border-color: var(--color-accent-500);
   }
 
-  .service-card-image {
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    background: var(--color-bg-muted);
-  }
-
-  .service-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--transition-slow);
-  }
-
-  .service-card:hover .service-card-image img {
-    transform: scale(1.04);
-  }
-
+  /* Card body */
   .service-card-body {
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-6) var(--space-6);
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -180,6 +162,7 @@ const {
     font-weight: 700;
     color: var(--color-text);
     margin: 0;
+    line-height: 1.2;
   }
 
   .service-card-desc {
@@ -201,11 +184,13 @@ const {
     align-items: center;
     gap: var(--space-2);
     font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--color-brand-600);
+    font-weight: 700;
+    color: var(--color-accent-500);
     margin-top: auto;
-    padding-top: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
     transition: gap var(--transition-fast);
+    letter-spacing: 0.01em;
   }
 
   .service-card:hover .service-card-cta { gap: var(--space-3); }
