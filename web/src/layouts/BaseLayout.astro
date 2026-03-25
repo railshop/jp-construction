@@ -13,15 +13,18 @@ import '../styles/global.css';
 interface Props {
   seo: SEOProps;
   fullWidthHero?: boolean;
+  preloadImage?: string;
 }
 
-const { seo, fullWidthHero = false } = Astro.props;
+const { seo, fullWidthHero = false, preloadImage } = Astro.props;
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <SEO seo={seo} />
+
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
 
     <!-- Google Fonts — preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

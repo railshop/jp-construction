@@ -290,108 +290,113 @@ const areaPoints = serviceAreas
 {useLeaflet && (
   <script is:inline>
     (function () {
-      // Load Leaflet CSS
-      var cssLink = document.createElement('link');
-      cssLink.rel = 'stylesheet';
-      cssLink.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(cssLink);
+      var mapEl = document.getElementById('leaflet-map');
+      if (!mapEl) return;
 
-      // Load Leaflet JS then initialise
-      var script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = function () {
-        var mapEl = document.getElementById('leaflet-map');
-        if (!mapEl) return;
+      var loaded = false;
 
-        var lat  = parseFloat(mapEl.dataset.lat || '0');
-        var lng  = parseFloat(mapEl.dataset.lng || '0');
-        var zoom = parseInt(mapEl.dataset.zoom || '10');
-        var areas = JSON.parse(mapEl.dataset.areas || '[]');
-        var businessName = mapEl.dataset.business || '';
+      function loadAndInitMap() {
+        if (loaded) return;
+        loaded = true;
 
-        var L = window.L;
-        var defaultZoom = 11;
-        var map = L.map('leaflet-map', { zoomControl: true }).setView([lat, lng], defaultZoom);
+        // Load Leaflet CSS
+        var cssLink = document.createElement('link');
+        cssLink.rel = 'stylesheet';
+        cssLink.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(cssLink);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        }).addTo(map);
+        // Load Leaflet JS then initialise
+        var script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = function () {
+          var lat  = parseFloat(mapEl.dataset.lat || '0');
+          var lng  = parseFloat(mapEl.dataset.lng || '0');
+          var areas = JSON.parse(mapEl.dataset.areas || '[]');
+          var businessName = mapEl.dataset.business || '';
 
-        // Red dot marker for business location
-        var redIcon = L.divIcon({
-          className: '',
-          html: '<div style="width:14px;height:14px;background:#dc1f26;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
-          iconSize: [14, 14],
-          iconAnchor: [7, 7],
-        });
-        L.marker([lat, lng], { icon: redIcon }).addTo(map)
-          .bindPopup('<strong>' + businessName + '</strong>', { closeButton: false });
+          var L = window.L;
+          var defaultZoom = 11;
+          var map = L.map('leaflet-map', { zoomControl: true }).setView([lat, lng], defaultZoom);
 
-        // Build circle overlays and add all to map immediately
-        var circles = {};
-        var allCircles = [];
-        areas.forEach(function (area) {
-          var circle = L.circle([area.lat, area.lng], {
-            color: '#dc1f26',
-            fillColor: '#dc1f26',
-            fillOpacity: 0.10,
-            opacity: 0.40,
-            weight: 1.5,
-            radius: 4200,
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19,
           }).addTo(map);
-          circles[area.slug] = circle;
-          allCircles.push(circle);
-        });
 
-        // Reset: return to North Huntingdon pin at default zoom
-        var activeSlug = null;
-
-        function resetView() {
-          map.setView([lat, lng], defaultZoom, { animate: true, duration: 0.5 });
-          allCircles.forEach(function (c) {
-            c.setStyle({ fillOpacity: 0.10, opacity: 0.40, weight: 1.5 });
+          var redIcon = L.divIcon({
+            className: '',
+            html: '<div style="width:14px;height:14px;background:#dc1f26;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>',
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
           });
-          document.querySelectorAll('[data-area-slug]').forEach(function (b) {
-            b.classList.remove('is-active');
+          L.marker([lat, lng], { icon: redIcon }).addTo(map)
+            .bindPopup('<strong>' + businessName + '</strong>', { closeButton: false });
+
+          var circles = {};
+          var allCircles = [];
+          areas.forEach(function (area) {
+            var circle = L.circle([area.lat, area.lng], {
+              color: '#dc1f26',
+              fillColor: '#dc1f26',
+              fillOpacity: 0.10,
+              opacity: 0.40,
+              weight: 1.5,
+              radius: 4200,
+            }).addTo(map);
+            circles[area.slug] = circle;
+            allCircles.push(circle);
           });
-          activeSlug = null;
-        }
 
-        var resetBtn = document.getElementById('map-reset-btn');
-        if (resetBtn) resetBtn.addEventListener('click', resetView);
+          var activeSlug = null;
 
-        document.querySelectorAll('[data-area-slug]').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var slug = btn.dataset.areaSlug;
-
-            // Toggle off if same area clicked
-            if (activeSlug === slug) {
-              resetView();
-              return;
-            }
-
-            // Dim all circles, highlight the selected one
+          function resetView() {
+            map.setView([lat, lng], defaultZoom, { animate: true, duration: 0.5 });
             allCircles.forEach(function (c) {
-              c.setStyle({ fillOpacity: 0.04, opacity: 0.20, weight: 1 });
+              c.setStyle({ fillOpacity: 0.10, opacity: 0.40, weight: 1.5 });
             });
-            circles[slug].setStyle({ fillOpacity: 0.18, opacity: 0.70, weight: 2 });
-
-            // Update active button state
             document.querySelectorAll('[data-area-slug]').forEach(function (b) {
               b.classList.remove('is-active');
             });
-            btn.classList.add('is-active');
-            activeSlug = slug;
+            activeSlug = null;
+          }
 
-            // Zoom to selected area
-            var area = areas.find(function (a) { return a.slug === slug; });
-            map.setView([area.lat, area.lng], 12, { animate: true, duration: 0.5 });
+          var resetBtn = document.getElementById('map-reset-btn');
+          if (resetBtn) resetBtn.addEventListener('click', resetView);
+
+          document.querySelectorAll('[data-area-slug]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var slug = btn.dataset.areaSlug;
+              if (activeSlug === slug) { resetView(); return; }
+              allCircles.forEach(function (c) {
+                c.setStyle({ fillOpacity: 0.04, opacity: 0.20, weight: 1 });
+              });
+              circles[slug].setStyle({ fillOpacity: 0.18, opacity: 0.70, weight: 2 });
+              document.querySelectorAll('[data-area-slug]').forEach(function (b) {
+                b.classList.remove('is-active');
+              });
+              btn.classList.add('is-active');
+              activeSlug = slug;
+              var area = areas.find(function (a) { return a.slug === slug; });
+              map.setView([area.lat, area.lng], 12, { animate: true, duration: 0.5 });
+            });
           });
-        });
-      };
-      document.head.appendChild(script);
+        };
+        document.head.appendChild(script);
+      }
+
+      // Only load Leaflet when map scrolls into view
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting) {
+            loadAndInitMap();
+            observer.disconnect();
+          }
+        }, { rootMargin: '200px' });
+        observer.observe(mapEl);
+      } else {
+        loadAndInitMap();
+      }
     })();
   </script>
 )}
