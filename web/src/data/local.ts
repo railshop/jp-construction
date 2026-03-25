@@ -37,7 +37,7 @@ export const business: Business = {
   yearEstablished: 2015,
   serviceRadius: 'Westmoreland County and surrounding areas',
   schemaType: 'GeneralContractor',
-  description: 'JP Construction is a full-service general contractor based in North Huntingdon, PA — delivering custom home builds, additions, garage construction, and commercial build-outs for homeowners and businesses across Westmoreland County.',
+  description: 'JP Construction is a full-service general contractor based in North Huntingdon, PA. We build custom homes, additions, garages, and commercial spaces for homeowners and businesses across Westmoreland County.',
   tagline: 'Built Right. Built to Last.',
 };
 
