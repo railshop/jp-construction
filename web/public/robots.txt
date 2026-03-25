@@ -1,8 +1,5 @@
 User-agent: *
-Allow: /
+Disallow: /
 
-# Block landing pages from indexing
-Disallow: /lp/
-
-# Sitemap location — update SITE_URL before deploy
-Sitemap: https://buildwithjp.com/sitemap-index.xml
+# TODO: Before go-live, change back to Allow: / and re-enable sitemap
+# Sitemap: https://buildwithjp.com/sitemap-index.xml
