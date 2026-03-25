@@ -93,12 +93,14 @@ const aboutSchema = {
             JP Construction is a family-owned business built on a straightforward premise: when you hire us,
             you get a team that treats your project with the same care they'd bring to their own home.
             Founded in {business.yearEstablished || '2015'}, we've built our reputation one project at a time
-            — through quality work, honest communication, and results that hold up long after we're gone.
+            — through quality work, honest communication, and consistent standards from first site visit to final walkthrough.
           </p>
           <p class="owners-bio">
-            That accountability isn't just a selling point. It means consistent standards at every stage,
-            from the first site visit through final walkthrough. Every material choice, every subcontractor,
-            every schedule decision reflects the standard this company was built on.
+            JP Construction operates as the residential and commercial construction division of
+            <a href="https://www.jpoperations.com/" target="_blank" rel="noopener noreferrer" class="owners-link">JP Operations</a>
+            — an established excavation, site work, and civil concrete contractor serving Western Pennsylvania.
+            That relationship means site preparation, grading, and foundation work aren't handed off to a stranger.
+            They're handled in-house, by a crew that operates to the same standard on every job.
           </p>
         </div>
 
@@ -298,6 +300,17 @@ const aboutSchema = {
     color: var(--color-text-muted);
     line-height: 1.75;
     margin: 0 0 var(--space-5);
+  }
+
+  .owners-link {
+    color: var(--color-accent-500);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+  }
+
+  .owners-link:hover {
+    color: var(--color-accent-600);
   }
 
   .owners-image-wrap {
