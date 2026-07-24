@@ -199,9 +199,13 @@ const services = await getServices();
 
   /* ── Info Column ──────────────────────────────────────────────────────────── */
 
-  .contact-info-col {
-    position: sticky;
-    top: calc(var(--header-height) + var(--space-8));
+  /* Sticky only in the two-column desktop layout; when the columns stack,
+     sticky pins the info block and the form scrolls underneath it */
+  @media (min-width: 1024px) {
+    .contact-info-col {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
   }
 
   .contact-page-title {
