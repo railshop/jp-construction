@@ -14,21 +14,20 @@ const projects = await getProjects();
 ---
 
 <BaseLayout seo={{
-  title: `Our Work — Projects & Portfolio`,
+  title: `Our Work | Projects & Portfolio`,
   description: `Browse completed projects by ${business.name}. Real work, real results for homeowners and businesses in ${business.address.city} and surrounding areas.`,
   breadcrumbs: [{ name: 'Projects', url: '/projects/' }],
 }}>
 
   <div class="page-hero">
     <div class="container">
-      <p class="section-eyebrow">Portfolio</p>
       <h1 class="section-title">Real Work.<br/>Real Results.</h1>
       <p class="section-subtitle">
         Every project shown here was built and managed by JP Construction from first site visit to final walkthrough. The work speaks for itself.
       </p>
       <div class="hero-actions">
         <a href={contactUrl()} class="btn btn-primary btn-lg">Start Your Project</a>
-        <a href={servicesUrl()} class="btn btn-ghost-light btn-lg">View Our Services</a>
+        <a href={servicesUrl()} class="btn btn-ghost btn-lg">View Our Services</a>
       </div>
     </div>
   </div>
@@ -73,7 +72,7 @@ const projects = await getProjects();
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1600&q=80&auto=format&fit=crop');
+    background-image: url('/images/project-custom-home.jpg');
     background-size: cover;
     background-position: center 55%;
   }
@@ -101,17 +100,5 @@ const projects = await getProjects();
     flex-wrap: wrap;
     gap: var(--space-4);
     margin-top: var(--space-8);
-  }
-
-  .btn-ghost-light {
-    color: rgba(255,255,255,0.85);
-    border-color: rgba(255,255,255,0.30);
-    background: transparent;
-  }
-
-  .btn-ghost-light:hover {
-    color: #fff;
-    border-color: rgba(255,255,255,0.65);
-    background: rgba(255,255,255,0.08);
   }
 </style>

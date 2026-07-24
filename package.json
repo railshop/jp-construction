@@ -8,13 +8,9 @@
     "build": "npm run build --workspace=web",
     "verify": "node scripts/verify-build.mjs",
     "build:verify": "npm run build && npm run verify",
-    "preview": "npm run preview --workspace=web",
-    "dev:v2": "npm run dev --workspace=web-v2",
-    "build:v2": "npm run build --workspace=web-v2",
-    "preview:v2": "npm run preview --workspace=web-v2"
+    "preview": "npm run preview --workspace=web"
   },
   "workspaces": [
-    "web",
-    "web-v2"
+    "web"
   ]
 }

@@ -93,7 +93,7 @@ const localBusinessSchema = {
 
 <BaseLayout
   seo={{
-    title: `${business.name} — ${business.address.city}, ${business.address.state}`,
+    title: `${business.name} | ${business.address.city}, ${business.address.state}`,
     description: `${business.name} delivers custom home builds, additions, garages, and commercial build-outs across ${business.serviceRadius}. Free estimates.`,
     schema: localBusinessSchema,
   }}
@@ -102,11 +102,11 @@ const localBusinessSchema = {
   {config.features.emergencyBanner && <EmergencyBanner />}
 
   <Hero
-    headline={`<em>Built Right.<br>Built to Last.</em>`}
-    subheadline={business.description}
+    headline={`Built Right.<br><em>Built to Last.</em>`}
+    subheadline={`Custom homes, additions, garages, and commercial build-outs across Westmoreland County. One crew, one point of contact, no surprises.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     secondaryCta={{ label: 'View Our Work', href: '/projects/' }}
-    backgroundImage="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1800&q=85&auto=format&fit=crop"
+    backgroundImage="/images/hero-home.jpg"
     googleReviews={{ rating: 4.9 }}
     bbbAccredited={{}}
     jpOpsCredit={true}
@@ -129,18 +129,16 @@ const localBusinessSchema = {
   <!-- Services -->
   <ServiceCardsGrid
     services={services}
-    eyebrow="What We Do"
-    title={`${business.address.city}'s Trusted ${config.schemaType.replace(/([A-Z])/g, ' $1').trim()} Services`}
-    subtitle={`Professional, reliable service from a team that takes pride in every job.`}
+    title="What We Build"
+    subtitle={`Five core services, one standard of work. Every project is managed start to finish by the same team.`}
   />
 
   <!-- Featured Projects -->
   {config.features.projects && projects.length > 0 && (
     <FeaturedProjects
       projects={projects}
-      eyebrow="Our Work"
       title="Built to Show For"
-      subtitle={`Real projects, real results — across Westmoreland County and beyond.`}
+      subtitle={`Real projects and real results across Westmoreland County and beyond.`}
     />
   )}
 

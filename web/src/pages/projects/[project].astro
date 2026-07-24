@@ -99,7 +99,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
             <div class:list={['gallery-slide', { 'gallery-slide--active': i === 0 }]} data-index={i}>
               <img
                 src={img}
-                alt={`${project.title} — photo ${i + 1} of ${project.images.length}`}
+                alt={`${project.title} , photo ${i + 1} of ${project.images.length}`}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 width="1200"
                 height="800"
@@ -189,7 +189,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   {projects.filter(p => p.slug !== project.slug).length > 0 && (
     <section class="section more-projects">
       <div class="container">
-        <p class="section-eyebrow">Portfolio</p>
         <h2 class="more-projects-heading">More Projects</h2>
         <ul class="more-projects-grid" role="list">
           {projects

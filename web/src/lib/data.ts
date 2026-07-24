@@ -249,14 +249,14 @@ export function generateComboContent(
   return {
     headline: `${service.name} in ${area.name}, ${business.address.state}`,
 
-    subheadline: `Professional ${service.name.toLowerCase()} in ${area.name}, ${business.address.state}. Licensed, insured, and locally based — free estimates on every project.`,
+    subheadline: `Professional ${service.name.toLowerCase()} in ${area.name}, ${business.address.state}. Licensed, insured, and locally based, with free estimates on every project.`,
 
     heroDescription: years
-      ? `${business.name} has delivered ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle} for ${years}+ years. Every project is managed start to finish — on-site, on schedule, and built to the standard your property deserves.`
-      : `${business.name} delivers ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle}. Every project is managed start to finish — on-site, on schedule, and built to the standard your property deserves.`,
+      ? `${business.name} has delivered ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle} for ${years}+ years. Every project is managed start to finish: on-site, on schedule, and built to the standard your property deserves.`
+      : `${business.name} delivers ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle}. Every project is managed start to finish: on-site, on schedule, and built to the standard your property deserves.`,
 
     localAngle: ctx?.commonChallenges?.length
-      ? `We've completed projects throughout ${area.name} and know the conditions that affect ${service.name.toLowerCase()} quality here firsthand — from ${ctx.commonChallenges[0].toLowerCase().split(' ').slice(0, 6).join(' ')} to permit timelines with ${area.county || 'local'} offices. That knowledge shapes every decision we make on your project.`
+      ? `We've completed projects throughout ${area.name} and know the conditions that affect ${service.name.toLowerCase()} quality here firsthand, from ${ctx.commonChallenges[0].toLowerCase().split(' ').slice(0, 6).join(' ')} to permit timelines with ${area.county || 'local'} offices. That knowledge shapes every decision we make on your project.`
       : `We've worked throughout ${area.name} and understand the specific site conditions, permit requirements, and construction challenges that affect ${service.name.toLowerCase()} quality and longevity here.`,
 
     whyUsLocal: years
@@ -274,7 +274,7 @@ export function generateComboContent(
     metaDescription: [
       `${business.name} offers professional ${service.name.toLowerCase()} in ${area.name}, ${area.county || business.address.state}.`,
       ctx?.propertyCharacter ? `Specialized experience with ${ctx.propertyCharacter}.` : '',
-      `Licensed, insured. Free estimates. ${area.responseTime ? area.responseTime + ' response.' : 'Fast response.'}`,
+      `Licensed, insured. Free estimates.`,
     ].filter(Boolean).join(' ').slice(0, 158),
 
     ogTitle: `${service.name} in ${area.name} | ${business.name}`,
@@ -299,13 +299,11 @@ export function generateComboFaqs(
       question: `How much does ${service.name.toLowerCase()} cost in ${area.name}?`,
       answer: service.priceRange
         ? `${service.name} in ${area.name} typically ranges from $${service.priceRange.min.toLocaleString()} to $${service.priceRange.max.toLocaleString()} depending on the scope of work, property size, and site conditions. ${business.name} provides free, detailed estimates with no obligation.`
-        : `Pricing for ${service.name.toLowerCase()} in ${area.name} depends on your property's specific needs. ${business.name} offers free estimates — contact us for an accurate quote.`,
+        : `Pricing for ${service.name.toLowerCase()} in ${area.name} depends on your property's specific needs. ${business.name} offers free estimates, so contact us for an accurate quote.`,
     },
     {
-      question: `How quickly can ${business.name} respond in ${area.name}?`,
-      answer: area.responseTime
-        ? `We can typically reach ${area.name} within ${area.responseTime}. ${service.emergency ? 'We offer 24/7 emergency service for urgent situations.' : 'We schedule most jobs within the week and always confirm your appointment in advance.'}`
-        : `${business.name} serves ${area.name} as part of our regular service area. Contact us for current scheduling availability.`,
+      question: `Does ${business.name} regularly work in ${area.name}?`,
+      answer: `Yes. ${area.name} is part of our regular service area. ${service.emergency ? 'We offer 24/7 emergency service for urgent situations.' : 'We schedule most estimates within the week and always confirm your appointment in advance.'}`,
     },
     {
       question: `Is ${business.name} licensed and insured to work in ${area.name}?`,
@@ -317,7 +315,7 @@ export function generateComboFaqs(
     }] : []),
     {
       question: `Do you serve areas near ${area.name}?`,
-      answer: `Yes — in addition to ${area.name}, we serve ${area.county || 'the surrounding area'}${area.nearby?.length ? `, including nearby communities` : ''}. Contact us to confirm coverage for your specific location.`,
+      answer: `Yes. In addition to ${area.name}, we serve ${area.county || 'the surrounding area'}${area.nearby?.length ? `, including nearby communities` : ''}. Contact us to confirm coverage for your specific location.`,
     },
     ...(ctx?.permitNotes ? [{
       question: `Do I need a permit for ${service.name.toLowerCase()} in ${area.name}?`,

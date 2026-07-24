@@ -48,8 +48,7 @@ const faqSchema = includeSchema && faqs.length > 0
 <section class:list={['section faq-section', `faq-section--${variant}`]}>
   <div class="container">
     <div class="faq-layout">
-      <header class="faq-header">
-        {eyebrow && <p class="section-eyebrow">{eyebrow}</p>}
+      <header class="faq-header reveal">
         {title   && <h2 class="section-title">{title}</h2>}
         {subtitle && <p class="section-subtitle">{subtitle}</p>}
         <a href="/contact/" class="btn btn-primary" style="margin-top: var(--space-6)">
@@ -188,12 +187,17 @@ const faqSchema = includeSchema && faqs.length > 0
     text-align: left;
     font-family: var(--font-body);
     font-size: var(--text-base);
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-text);
     background: none;
     border: none;
+    border-left: 3px solid transparent;
     cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast);
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .faq-question[aria-expanded="true"] {
+    border-left-color: var(--color-accent-500);
   }
 
   .faq-question:hover {

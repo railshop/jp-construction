@@ -76,7 +76,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
         <span aria-hidden="true">/</span>
         <span aria-current="page">{service.name}</span>
       </nav>
-      <p class="section-eyebrow">Our Services</p>
       {service.emergency && (
         <span class="badge badge-accent" style="display:inline-flex;margin-bottom:var(--space-4)">24/7 Emergency Service</span>
       )}
@@ -96,7 +95,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     <div class="container">
       <div class="service-intro-grid">
         <div class="service-intro-text">
-          <p class="section-eyebrow">What We Do</p>
           <h2 class="service-intro-heading">{service.shortDescription}</h2>
           <p class="service-intro-desc">{service.description}</p>
         </div>
@@ -202,16 +200,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     flex-wrap: wrap;
     gap: var(--space-4);
     margin-top: var(--space-8);
-  }
-
-  .service-hero .btn-ghost {
-    color: #ffffff;
-    border-color: var(--color-neutral-500);
-  }
-
-  .service-hero .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--color-neutral-300);
   }
 
   /* ── Service intro ────────────────────────────────────────────────────────── */

@@ -1,10 +1,9 @@
 ---
 /**
- * ProcessSteps.astro
- *
- * Connected stepper — numbered circles linked by a horizontal rule on desktop,
- * vertical timeline on mobile. Oswald step titles, Lato descriptions.
- * No decorative bars — the circle and connector do the structural work.
+ * ProcessSteps.astro (v2)
+ * Structural process grid. Oversized Oswald numerals over a hairline track,
+ * red tick marking each step. Vertical rail layout on mobile.
+ * The eyebrow prop is accepted for compatibility but no longer rendered.
  */
 
 interface Step {
@@ -22,41 +21,31 @@ interface Props {
 
 const {
   steps,
-  eyebrow = 'How It Works',
-  title = 'Our Process',
+  title = 'How We Work',
   subtitle,
   variant = 'light',
 } = Astro.props;
 ---
 
-<section class:list={['section process-section', `process-section--${variant}`]}>
+<section class:list={['section process-section', `process-section--${variant}`, { 'texture-grid': variant === 'dark' }]}>
   <div class="container">
 
-    <header class="process-header">
-      {eyebrow && <p class="section-eyebrow">{eyebrow}</p>}
+    <header class="process-header reveal">
       {title   && <h2 class="section-title">{title}</h2>}
       {subtitle && <p class="section-subtitle">{subtitle}</p>}
     </header>
 
     <ol class="process-list" role="list">
       {steps.map((step, i) => (
-        <li class="process-step animate-fade-up" style={`animation-delay: ${i * 120}ms`}>
-
-          <!-- Circle + connector row -->
-          <div class="process-step-track" aria-hidden="true">
-            <div class="process-connector process-connector--before" />
-            <div class="process-circle">
-              <span class="process-circle-num">{String(i + 1).padStart(2, '0')}</span>
-            </div>
-            <div class="process-connector process-connector--after" />
+        <li class:list={['process-step', 'reveal', `reveal-d${Math.min(i + 1, 5)}`]}>
+          <div class="process-track" aria-hidden="true">
+            <span class="process-num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="process-tick"></span>
           </div>
-
-          <!-- Content -->
           <div class="process-content">
             <h3 class="process-title">{step.title}</h3>
             <p class="process-desc">{step.description}</p>
           </div>
-
         </li>
       ))}
     </ol>
@@ -78,30 +67,16 @@ const {
     color: #ffffff;
   }
 
-  .process-section--dark .section-eyebrow {
-    color: var(--color-accent-500);
-  }
-
   .process-section--dark .section-subtitle,
   .process-section--dark .process-desc {
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  .process-section--dark .process-connector {
-    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.55);
   }
 
   /* ─── Header ─────────────────────────────────────────────────────────────── */
 
   .process-header {
-    text-align: center;
-    max-width: 640px;
-    margin-inline: auto;
-    margin-bottom: var(--space-12);
-  }
-
-  .process-header .section-eyebrow {
-    justify-content: center;
+    max-width: 720px;
+    margin-bottom: var(--space-16);
   }
 
   /* ─── Grid ───────────────────────────────────────────────────────────────── */
@@ -112,121 +87,68 @@ const {
     margin: 0;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: var(--space-10);
   }
 
   @media (min-width: 768px) {
     .process-list {
       grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-8);
     }
   }
 
   /* ─── Step ───────────────────────────────────────────────────────────────── */
 
   .process-step {
-    opacity: 0;
-    animation-fill-mode: forwards;
     display: flex;
     flex-direction: column;
-    gap: 0;
   }
 
-  /* ─── Track: circle + horizontal connectors ──────────────────────────────── */
-
-  .process-step-track {
-    display: flex;
-    align-items: center;
-    margin-bottom: var(--space-6);
-  }
-
-  /* Connector line — hidden on mobile, visible on desktop */
-  .process-connector {
-    flex: 1;
-    height: 1px;
-    background: var(--color-border-strong);
-    display: none;
-  }
-
-  @media (min-width: 768px) {
-    .process-connector { display: block; }
-
-    /* First step: hide left connector. Last step: hide right connector. */
-    .process-step:first-child .process-connector--before,
-    .process-step:last-child  .process-connector--after {
-      visibility: hidden;
-    }
-  }
-
-  /* Mobile: vertical left-border layout */
-  @media (max-width: 767px) {
-    .process-step {
-      flex-direction: row;
-      gap: var(--space-5);
-      padding-bottom: var(--space-8);
-      position: relative;
-    }
-
-    .process-step:last-child { padding-bottom: 0; }
-
-    .process-step-track {
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 0;
-      flex-shrink: 0;
-      width: 68px;
-    }
-
-    /* Vertical connector between circles on mobile */
-    .process-connector {
-      display: block;
-      width: 1px;
-      height: auto;
-      flex: 1;
-      min-height: var(--space-8);
-    }
-
-    .process-connector--before { display: none; }
-
-    .process-step:last-child .process-connector--after { display: none; }
-  }
-
-  /* ─── Circle ──────────────────────────────────────────────────────────────── */
-
-  .process-circle {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--color-accent-500);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+  /* Numeral over a hairline with a red tick */
+  .process-track {
     position: relative;
-    transition: background var(--transition-fast), transform var(--transition-fast);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent-500) 15%, transparent);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border-strong);
   }
 
-  .process-step:hover .process-circle {
-    background: var(--color-accent-600);
-    transform: scale(1.07);
+  .process-section--dark .process-track {
+    border-color: rgba(255, 255, 255, 0.14);
   }
 
-  .process-circle-num {
+  .process-num {
     font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 0.04em;
+    font-size: clamp(2.75rem, 4vw, 3.75rem);
+    font-weight: 600;
     line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-brand-300);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--transition-base), -webkit-text-stroke-color var(--transition-base);
   }
+
+  .process-step:hover .process-num {
+    color: var(--color-accent-500);
+    -webkit-text-stroke-color: var(--color-accent-500);
+  }
+
+  .process-section--dark .process-num {
+    -webkit-text-stroke-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .process-tick {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 32px;
+    height: 3px;
+    background: var(--color-accent-500);
+    transition: width var(--transition-base);
+  }
+
+  .process-step:hover .process-tick { width: 56px; }
 
   /* ─── Content ────────────────────────────────────────────────────────────── */
-
-  @media (min-width: 768px) {
-    .process-content {
-      padding-right: var(--space-6);
-    }
-  }
 
   .process-content {
     display: flex;
@@ -237,13 +159,13 @@ const {
 
   .process-title {
     font-family: var(--font-display);
-    font-size: 1.1rem;
+    font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-text);
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.25;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
   }
 
   .process-desc {
@@ -252,11 +174,5 @@ const {
     color: var(--color-text-muted);
     line-height: 1.75;
     margin: 0;
-  }
-
-  /* ─── Dark variant overrides ─────────────────────────────────────────────── */
-
-  .process-section--dark .process-title {
-    color: rgba(255, 255, 255, 0.9);
   }
 </style>

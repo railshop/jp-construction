@@ -12,7 +12,10 @@
  */
 
 import type { ServiceArea, Service } from '../../lib/data';
+import { getBusiness } from '../../lib/data';
 import { comboUrl, areaUrl } from '../../lib/urls';
+
+const business = await getBusiness();
 
 interface Props {
   service: Service;
@@ -43,7 +46,6 @@ const displayTitle = title || `${service.name} in Every Area We Serve`;
   <section class="seo-service-areas section-sm">
     <div class="container">
       <div class="ssa-header">
-        <p class="section-eyebrow">Where We Work</p>
         <h2 class="section-title">{displayTitle}</h2>
         <p class="section-subtitle">Select your community for pricing and details specific to your area.</p>
       </div>
@@ -56,17 +58,8 @@ const displayTitle = title || `${service.name} in Every Area We Serve`;
               <li>
                 <a href={comboUrl(area.slug, service.slug)} class="ssa-card ssa-card--primary">
                   <div class="ssa-card-body">
-                    <span class="ssa-area-name">{area.name}</span>
+                    <span class="ssa-area-name">{area.name}, {business.address.state}</span>
                     {area.county && <span class="ssa-county">{area.county}</span>}
-                    {showResponseTime && area.responseTime && (
-                      <span class="ssa-response">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10"/>
-                          <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        {area.responseTime}
-                      </span>
-                    )}
                   </div>
                   <svg class="ssa-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -87,17 +80,8 @@ const displayTitle = title || `${service.name} in Every Area We Serve`;
               <li>
                 <a href={comboUrl(area.slug, service.slug)} class="ssa-card">
                   <div class="ssa-card-body">
-                    <span class="ssa-area-name">{area.name}</span>
+                    <span class="ssa-area-name">{area.name}, {business.address.state}</span>
                     {area.county && <span class="ssa-county">{area.county}</span>}
-                    {showResponseTime && area.responseTime && (
-                      <span class="ssa-response">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10"/>
-                          <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        {area.responseTime}
-                      </span>
-                    )}
                   </div>
                   <svg class="ssa-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -212,15 +196,6 @@ const displayTitle = title || `${service.name} in Every Area We Serve`;
   .ssa-county {
     font-size: var(--text-xs);
     color: var(--color-text-subtle);
-  }
-
-  .ssa-response {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: var(--text-xs);
-    color: var(--color-brand-600);
-    font-weight: 500;
   }
 
   .ssa-arrow {

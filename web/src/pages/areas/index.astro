@@ -18,21 +18,20 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
 ---
 
 <BaseLayout seo={{
-  title: `Service Areas — ${business.address.city} and Surrounding Communities`,
-  description: `${business.name} serves ${business.serviceRadius || business.address.city + ' and surrounding areas'}. View all areas we cover and response times.`,
+  title: `Service Areas | ${business.address.city} and Surrounding Communities`,
+  description: `${business.name} serves ${business.serviceRadius || business.address.city + ' and surrounding areas'}. View all the communities we cover.`,
   breadcrumbs: [{ name: 'Service Areas', url: '/areas/' }],
 }}>
 
   <div class="page-hero">
     <div class="container">
-      <p class="section-eyebrow">Where We Work</p>
       <h1 class="section-title">Same Crew.<br/>Wherever You Are.</h1>
       <p class="section-subtitle">
         Based in North Huntingdon, we cover Westmoreland County and the surrounding region. Wherever you are, you get the same crew, the same standards, and the same accountability.
       </p>
       <div class="hero-actions">
         <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
-        <a href={servicesUrl()} class="btn btn-ghost-light btn-lg">View Our Services</a>
+        <a href={servicesUrl()} class="btn btn-ghost btn-lg">View Our Services</a>
       </div>
     </div>
   </div>
@@ -47,17 +46,8 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
               <li>
                 <a href={`/areas/${area.slug}/`} class="area-card area-card--primary">
                   <div class="area-card-body">
-                    <h3 class="area-card-name">{area.name}</h3>
+                    <h3 class="area-card-name">{area.name}, {business.address.state}</h3>
                     {area.county && <p class="area-card-county">{area.county}</p>}
-                    {area.responseTime && (
-                      <p class="area-card-response">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10"/>
-                          <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        {area.responseTime} response
-                      </p>
-                    )}
                   </div>
                   <svg class="area-card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -78,17 +68,8 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
               <li>
                 <a href={`/areas/${area.slug}/`} class="area-card">
                   <div class="area-card-body">
-                    <h3 class="area-card-name">{area.name}</h3>
+                    <h3 class="area-card-name">{area.name}, {business.address.state}</h3>
                     {area.county && <p class="area-card-county">{area.county}</p>}
-                    {area.responseTime && (
-                      <p class="area-card-response">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10"/>
-                          <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        {area.responseTime} response
-                      </p>
-                    )}
                   </div>
                   <svg class="area-card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -121,9 +102,8 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
     <div class="container">
       <div class="services-strip-header">
         <div>
-          <p class="section-eyebrow">What We Do</p>
           <h2 class="services-strip-title">Every Service, Every Area</h2>
-          <p class="services-strip-sub">Wherever you are in our coverage area, you get our full range of services — the same crew, the same standards, and the same commitment to getting it right.</p>
+          <p class="services-strip-sub">Wherever you are in our coverage area, you get our full range of services: the same crew, the same standards, and the same commitment to getting it right.</p>
         </div>
         <a href="/services/" class="services-strip-link">
           View all services
@@ -175,7 +155,7 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1600&q=80&auto=format&fit=crop');
+    background-image: url('/images/area-north-huntingdon.jpg');
     background-size: cover;
     background-position: center 60%;
   }
@@ -203,18 +183,6 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
     flex-wrap: wrap;
     gap: var(--space-4);
     margin-top: var(--space-8);
-  }
-
-  .btn-ghost-light {
-    color: rgba(255,255,255,0.85);
-    border-color: rgba(255,255,255,0.30);
-    background: transparent;
-  }
-
-  .btn-ghost-light:hover {
-    color: #fff;
-    border-color: rgba(255,255,255,0.65);
-    background: rgba(255,255,255,0.08);
   }
 
   .areas-group { margin-bottom: var(--space-12); }
@@ -264,16 +232,6 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
 
   .area-card-name   { font-weight: 700; color: var(--color-text); margin: 0 0 var(--space-1); font-size: var(--text-base); }
   .area-card-county { font-size: var(--text-xs); color: var(--color-text-muted); margin: 0 0 var(--space-1); }
-
-  .area-card-response {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-size: var(--text-xs);
-    color: var(--color-brand-600);
-    font-weight: 500;
-    margin: 0;
-  }
 
   .area-card-arrow { color: var(--color-text-subtle); flex-shrink: 0; transition: transform var(--transition-fast); }
   .area-card:hover .area-card-arrow { transform: translateX(4px); color: var(--color-brand-600); }

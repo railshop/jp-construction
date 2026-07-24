@@ -17,14 +17,13 @@ const rest     = posts.filter(p => p !== featured);
 ---
 
 <BaseLayout seo={{
-  title: `Blog — Tips, Guides & News`,
+  title: `Blog | Tips, Guides & News`,
   description: `Expert tips, how-to guides, and industry news from ${business.name}. Serving ${business.address.city} and surrounding areas.`,
   breadcrumbs: [{ name: 'Blog', url: '/blog/' }],
 }}>
 
   <div class="page-hero">
     <div class="container">
-      <p class="section-eyebrow">Our Blog</p>
       <h1 class="section-title">Tips, Guides & Updates</h1>
       <p class="section-subtitle">Helpful advice from the team at {business.name}.</p>
     </div>
@@ -106,7 +105,7 @@ const rest     = posts.filter(p => p !== featured);
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1590644365607-044e4f2bbb0b?w=1600&q=80&auto=format&fit=crop');
+    background-image: url('/images/hero-home.jpg');
     background-size: cover;
     background-position: center 30%;
   }

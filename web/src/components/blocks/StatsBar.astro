@@ -1,7 +1,8 @@
 ---
 /**
- * StatsBar.astro
- * Bold stats bar — numbers in red, structure in near-black.
+ * StatsBar.astro (v2)
+ * Structural stats band. Numbers count up when scrolled into view;
+ * static for no-JS and reduced-motion users.
  */
 
 interface Stat {
@@ -15,25 +16,67 @@ interface Props {
 }
 
 const { stats, variant = 'dark' } = Astro.props;
+
+// Split "150+" into countable number and suffix for the counter script
+function parseStat(value: string) {
+  const m = value.match(/^(\d[\d,]*)(.*)$/);
+  if (!m) return { num: null, suffix: value };
+  return { num: parseInt(m[1].replace(/,/g, ''), 10), suffix: m[2] };
+}
 ---
 
-<div class:list={['stats-bar', `stats-bar--${variant}`]}>
+<div class:list={['stats-bar', 'texture-grid', `stats-bar--${variant}`]}>
   <div class="container">
     <ul class="stats-list" role="list">
-      {stats.map((stat, i) => (
-        <li class="stat-item">
-          <span class="stat-value">{stat.value}</span>
-          <span class="stat-label">{stat.label}</span>
-          {i < stats.length - 1 && <div class="stat-divider" aria-hidden="true"></div>}
-        </li>
-      ))}
+      {stats.map((stat, i) => {
+        const { num, suffix } = parseStat(stat.value);
+        return (
+          <li class="stat-item">
+            <span class="stat-value" data-count={num ?? undefined} data-suffix={suffix}>
+              {stat.value}
+            </span>
+            <span class="stat-label">{stat.label}</span>
+            {i < stats.length - 1 && <div class="stat-divider" aria-hidden="true"></div>}
+          </li>
+        );
+      })}
     </ul>
   </div>
 </div>
 
+<script>
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReduced && 'IntersectionObserver' in window) {
+    const els = document.querySelectorAll<HTMLElement>('.stat-value[data-count]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target as HTMLElement;
+        io.unobserve(el);
+
+        const target = parseInt(el.dataset.count || '0', 10);
+        const suffix = el.dataset.suffix || '';
+        const duration = 1400;
+        const start = performance.now();
+
+        function tick(now: number) {
+          const t = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = Math.round(target * eased).toLocaleString() + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.4 });
+
+    els.forEach(el => io.observe(el));
+  }
+</script>
+
 <style>
   .stats-bar {
-    padding-block: var(--space-12);
+    padding-block: var(--space-16);
     position: relative;
   }
 
@@ -73,12 +116,11 @@ const { stats, variant = 'dark' } = Astro.props;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
     position: relative;
     padding-inline: var(--space-4);
   }
 
-  /* Vertical divider between stats on desktop */
   .stat-divider {
     display: none;
   }
@@ -91,7 +133,7 @@ const { stats, variant = 'dark' } = Astro.props;
       top: 15%;
       bottom: 15%;
       width: 1px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.1);
     }
 
     .stats-bar--light .stat-divider {
@@ -101,27 +143,25 @@ const { stats, variant = 'dark' } = Astro.props;
 
   .stat-value {
     font-family: var(--font-display);
-    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
-    font-weight: 700;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 600;
     line-height: 1;
-    color: var(--color-accent-500);
-    letter-spacing: 0;
-    text-transform: uppercase;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
   }
 
   .stats-bar--light .stat-value {
-    color: var(--color-brand-800);
+    color: var(--color-brand-900);
   }
 
   .stat-label {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.45);
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    font-family: var(--font-display);
     font-size: var(--text-xs);
-    letter-spacing: 0.08em;
+    font-weight: 500;
+    color: var(--color-accent-400);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
-  .stats-bar--light .stat-label { color: var(--color-text-muted); }
+  .stats-bar--light .stat-label { color: var(--color-accent-600); }
 </style>

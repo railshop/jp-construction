@@ -13,7 +13,7 @@ interface Props {
 
 const { message } = Astro.props;
 const business = await getBusiness();
-const displayMessage = message || `24/7 Emergency Service Available — Call ${business.phone} Now`;
+const displayMessage = message || `24/7 Emergency Service Available. Call ${business.phone}`;
 ---
 
 <div class="emergency-banner" id="emergency-banner" role="alert">

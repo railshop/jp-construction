@@ -1,8 +1,7 @@
 ---
 /**
- * TrustBar.astro
- * Horizontal trust signals bar. Structured dark treatment with red icon accents.
- * Items are passed as <slot /> children from the parent page.
+ * TrustBar.astro (v2)
+ * Horizontal trust signals band. Items are passed as <slot /> children.
  */
 
 interface Props {
@@ -47,7 +46,7 @@ const { variant = 'dark' } = Astro.props;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--space-4) var(--space-8);
+    gap: var(--space-4) var(--space-10);
   }
 
   @media (max-width: 767px) {
@@ -56,7 +55,15 @@ const { variant = 'dark' } = Astro.props;
     }
   }
 
-  /* Items inside the trust bar — defined inline in each page */
+  /* Items inside the trust bar are defined inline in each page */
+  :global(.trust-bar .trust-item) {
+    font-family: var(--font-display) !important;
+    font-size: var(--text-xs) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+  }
+
   :global(.trust-bar--dark .trust-item),
   :global(.trust-bar--brand .trust-item) {
     color: rgba(255,255,255,0.55) !important;

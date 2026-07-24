@@ -38,9 +38,8 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
   <div class="container">
 
     <!-- Section header -->
-    <div class="fp-header">
+    <div class="fp-header reveal">
       <div class="fp-header-text">
-        {eyebrow && <p class="section-eyebrow fp-eyebrow">{eyebrow}</p>}
         {title && <h2 class="section-title fp-title">{title}</h2>}
         {subtitle && <p class="fp-subtitle">{subtitle}</p>}
       </div>
@@ -57,7 +56,7 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
       <div class="fp-showcase">
 
         <!-- Hero — full width, tall -->
-        <a href={`/projects/${featured.slug}/`} class="fp-hero animate-fade-up" style="animation-delay: 0ms">
+        <a href={`/projects/${featured.slug}/`} class="fp-hero reveal">
           <div class="fp-img">
             {featured.images[0]
               ? <img src={featured.images[0]} alt={featured.title} loading="eager" decoding="async" width="1200" height="600" />
@@ -87,8 +86,7 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
             {duocards.map((project, i) => (
               <a
                 href={`/projects/${project.slug}/`}
-                class="fp-card animate-fade-up"
-                style={`animation-delay: ${(i + 1) * 120}ms`}
+                class:list={['fp-card', 'reveal', `reveal-d${i + 1}`]}
               >
                 <div class="fp-img">
                   {project.images[0]
@@ -185,11 +183,8 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
     position: relative;
     display: block;
     text-decoration: none;
-    border-radius: var(--radius-lg);
     overflow: hidden;
     background: var(--color-brand-900);
-    opacity: 0;
-    animation-fill-mode: forwards;
   }
 
   /* Hero: wide cinematic proportions */

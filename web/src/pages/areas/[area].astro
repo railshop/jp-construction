@@ -51,7 +51,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
 <BaseLayout seo={{
   title: `${business.name} in ${area.name}, ${area.county || business.address.state}`,
-  description: `${business.name} serves ${area.name}${area.county ? ', ' + area.county : ''}. Professional, licensed service with ${area.responseTime || 'fast'} response times. Free estimates.`,
+  description: `${business.name} serves ${area.name}${area.county ? ', ' + area.county : ''}. Professional, licensed, and insured construction services. Free estimates.`,
   schema: localSchema,
   breadcrumbs: [
     { name: 'Service Areas', url: '/areas/' },
@@ -70,7 +70,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
         <span aria-current="page">{area.name}</span>
       </nav>
 
-      <p class="section-eyebrow">{area.county || 'Service Area'}</p>
       <h1 class="area-hero-title">Construction Services in {area.name}, {business.address.state}</h1>
       {area.description && (
         <p class="area-hero-desc">{area.description}</p>
@@ -119,7 +118,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
       <div class="container">
         <div class="nearby-header">
           <div>
-            <p class="section-eyebrow">Where We Work</p>
             <h2 class="nearby-title">Other Areas We Serve</h2>
           </div>
           <a href="/areas/" class="nearby-all-link">
@@ -136,16 +134,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
             <li>
               <a href={`/areas/${nearby.slug}/`} class="nearby-card nearby-card--primary">
                 <div class="nearby-card-body">
-                  <span class="nearby-card-name">{nearby.name}</span>
-                  {nearby.responseTime && (
-                    <span class="nearby-card-response">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      {nearby.responseTime}
-                    </span>
-                  )}
+                  <span class="nearby-card-name">{nearby.name}, {business.address.state}</span>
                 </div>
                 <svg class="nearby-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -174,7 +163,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
   <CtaBanner
     headline={`Need Service in ${area.name}?`}
-    subheadline={`We're ${area.responseTime ? area.responseTime + ' away' : 'nearby'}. Call or request a free quote online.`}
+    subheadline={`We're local and ready to help. Call or request a free quote online.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -221,16 +210,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   }
 
   .area-hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-8); }
-
-  .area-hero-actions .btn-ghost {
-    color: #ffffff;
-    border-color: var(--color-neutral-500);
-  }
-
-  .area-hero-actions .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--color-neutral-300);
-  }
 
   /* ── Other areas ──────────────────────────────────────────────────────────── */
   .nearby-section {
@@ -316,14 +295,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     font-weight: 600;
     color: var(--color-text);
     line-height: 1.3;
-  }
-
-  .nearby-card-response {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
   }
 
   .nearby-card-arrow {

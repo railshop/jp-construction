@@ -145,7 +145,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
         </div>
       )}
 
-      <p class="section-eyebrow">Our Services</p>
       <h1 class="combo-headline section-title">{content.headline}</h1>
       <p class="combo-subheadline">{content.subheadline}</p>
 
@@ -161,7 +160,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     <div class="container">
       <div class="combo-intro-grid">
         <div class="combo-intro-text">
-          <p class="section-eyebrow">Serving {area.name}, {business.address.state}</p>
           <h2 class="combo-intro-heading">{service.shortDescription}</h2>
           <p class="combo-intro-desc">{content.heroDescription}</p>
           <ul class="combo-trust-list" aria-label="Why choose JP Construction">
@@ -177,12 +175,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
               <li class="combo-trust-item">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                 24/7 Emergency Response
-              </li>
-            )}
-            {area.responseTime && (
-              <li class="combo-trust-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                {area.responseTime} response to {area.name}
               </li>
             )}
           </ul>
@@ -213,7 +205,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
         <!-- Header -->
         <div class="local-angle-header">
-          <p class="section-eyebrow">Why Local Matters</p>
           <h2 class="section-title">{service.name} Built for {area.name} Properties</h2>
         </div>
 
@@ -281,7 +272,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   <FaqAccordion
     faqs={comboFaqs}
     eyebrow="FAQ"
-    title={`${service.name} in ${area.name} — Common Questions`}
+    title={`${service.name} in ${area.name}: Common Questions`}
     includeSchema={false}
     variant="dark"
   />
@@ -314,7 +305,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   <!-- Final CTA -->
   <CtaBanner
     headline={content.ctaHeadline}
-    subheadline={`Licensed, insured, and ${area.responseTime ? area.responseTime + ' away' : 'local to ' + area.name}. Get your free estimate today.`}
+    subheadline={`Licensed, insured, and local to ${area.name}. Get your free estimate today.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -371,16 +362,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
     flex-wrap: wrap;
     gap: var(--space-4);
     margin-top: var(--space-8);
-  }
-
-  .combo-hero .btn-ghost {
-    color: #ffffff;
-    border-color: var(--color-neutral-500);
-  }
-
-  .combo-hero .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--color-neutral-300);
   }
 
   /* ── Local intro ─────────────────────────────────────────────────────────── */
