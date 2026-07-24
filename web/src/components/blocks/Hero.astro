@@ -440,6 +440,19 @@ const hasTrustStrip = !!(googleReviews || bbbAccredited || jpOpsCredit);
     .hts-sep:last-of-type { display: none; }
   }
 
+  /* Mobile: trust strip flows below content instead of overlaying it */
+  @media (max-width: 639px) {
+    .hero-trust-strip {
+      position: static;
+      margin-top: var(--space-10);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hero--trust-strip {
+      padding-bottom: 0;
+    }
+  }
+
   /* ─── Centered variant ───────────────────────────────────────────────────── */
   .hero--centered .hero-layout { justify-content: center; }
   .hero--centered .hero-rail { display: none; }

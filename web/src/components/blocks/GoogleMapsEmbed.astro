@@ -283,6 +283,30 @@ const areaPoints = serviceAreas
   .map-area--primary   { font-weight: 600; }
   .map-area--secondary { font-weight: 400; }
   .map-area--tertiary  { color: var(--color-text-muted); }
+
+  /* Mobile: overlay becomes a slim full-width bar with a scrollable row
+     so it stops covering the map */
+  @media (max-width: 639px) {
+    .map-areas-overlay {
+      left: var(--space-3);
+      right: var(--space-3);
+      bottom: var(--space-3);
+      max-width: none;
+    }
+
+    .map-areas-list {
+      flex-direction: row;
+      overflow-x: auto;
+      gap: var(--space-1);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .map-area-btn {
+      white-space: nowrap;
+      width: auto;
+      flex-shrink: 0;
+    }
+  }
 </style>
 
 {useLeaflet && (

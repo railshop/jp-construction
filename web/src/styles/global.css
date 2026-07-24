@@ -397,6 +397,23 @@ a {
 
 .btn-block { width: 100%; }
 
+/* Mobile: stacked action buttons go full width */
+@media (max-width: 639px) {
+  .hero-actions .btn,
+  .cta-banner-actions .btn,
+  .area-hero-actions .btn,
+  .form-submit-btn {
+    width: 100%;
+  }
+}
+
+/* Touch devices: guarantee minimum tap target height */
+@media (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+  }
+}
+
 /* ─── Card System ──────────────────────────────────────────────────────────── */
 
 .card {
