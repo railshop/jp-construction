@@ -1,0 +1,76 @@
+---
+/**
+ * TrustBar.astro (v2)
+ * Horizontal trust signals band. Items are passed as <slot /> children.
+ */
+
+interface Props {
+  variant?: 'light' | 'dark' | 'brand';
+}
+
+const { variant = 'dark' } = Astro.props;
+---
+
+<div class:list={['trust-bar', `trust-bar--${variant}`]}>
+  <div class="container">
+    <ul class="trust-bar-list" role="list">
+      <slot />
+    </ul>
+  </div>
+</div>
+
+<style>
+  .trust-bar {
+    padding-block: var(--space-5);
+  }
+
+  .trust-bar--light {
+    background: var(--color-bg-subtle);
+    border-block: 1px solid var(--color-border);
+  }
+
+  .trust-bar--dark {
+    background: var(--color-brand-900);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .trust-bar--brand {
+    background: var(--color-brand-900);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .trust-bar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4) var(--space-10);
+  }
+
+  @media (max-width: 767px) {
+    .trust-bar {
+      display: none;
+    }
+  }
+
+  /* Items inside the trust bar are defined inline in each page */
+  :global(.trust-bar .trust-item) {
+    font-family: var(--font-display) !important;
+    font-size: var(--text-xs) !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+  }
+
+  :global(.trust-bar--dark .trust-item),
+  :global(.trust-bar--brand .trust-item) {
+    color: rgba(255,255,255,0.55) !important;
+  }
+
+  :global(.trust-bar--dark .trust-item svg),
+  :global(.trust-bar--brand .trust-item svg) {
+    color: var(--color-accent-500) !important;
+  }
+</style>

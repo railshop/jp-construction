@@ -1,0 +1,167 @@
+---
+/**
+ * StatsBar.astro (v2)
+ * Structural stats band. Numbers count up when scrolled into view;
+ * static for no-JS and reduced-motion users.
+ */
+
+interface Stat {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  stats: Stat[];
+  variant?: 'light' | 'dark' | 'brand';
+}
+
+const { stats, variant = 'dark' } = Astro.props;
+
+// Split "150+" into countable number and suffix for the counter script
+function parseStat(value: string) {
+  const m = value.match(/^(\d[\d,]*)(.*)$/);
+  if (!m) return { num: null, suffix: value };
+  return { num: parseInt(m[1].replace(/,/g, ''), 10), suffix: m[2] };
+}
+---
+
+<div class:list={['stats-bar', 'texture-grid', `stats-bar--${variant}`]}>
+  <div class="container">
+    <ul class="stats-list" role="list">
+      {stats.map((stat, i) => {
+        const { num, suffix } = parseStat(stat.value);
+        return (
+          <li class="stat-item">
+            <span class="stat-value" data-count={num ?? undefined} data-suffix={suffix}>
+              {stat.value}
+            </span>
+            <span class="stat-label">{stat.label}</span>
+            {i < stats.length - 1 && <div class="stat-divider" aria-hidden="true"></div>}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</div>
+
+<script>
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReduced && 'IntersectionObserver' in window) {
+    const els = document.querySelectorAll<HTMLElement>('.stat-value[data-count]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target as HTMLElement;
+        io.unobserve(el);
+
+        const target = parseInt(el.dataset.count || '0', 10);
+        const suffix = el.dataset.suffix || '';
+        const duration = 1400;
+        const start = performance.now();
+
+        function tick(now: number) {
+          const t = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = Math.round(target * eased).toLocaleString() + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.4 });
+
+    els.forEach(el => io.observe(el));
+  }
+</script>
+
+<style>
+  .stats-bar {
+    padding-block: var(--space-16);
+    position: relative;
+  }
+
+  .stats-bar--dark {
+    background: var(--color-brand-950);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stats-bar--brand  {
+    background: var(--color-brand-900);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .stats-bar--light  {
+    background: var(--color-bg-subtle);
+    border-block: 1px solid var(--color-border);
+  }
+
+  .stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8) var(--space-6);
+    text-align: center;
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    .stats-list { grid-template-columns: repeat(4, 1fr); gap: 0; }
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    position: relative;
+    padding-inline: var(--space-4);
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .stat-divider {
+      display: block;
+      position: absolute;
+      right: 0;
+      top: 15%;
+      bottom: 15%;
+      width: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .stats-bar--light .stat-divider {
+      background: var(--color-border);
+    }
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 600;
+    line-height: 1;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stats-bar--light .stat-value {
+    color: var(--color-brand-900);
+  }
+
+  .stat-label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-accent-400);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .stats-bar--light .stat-label { color: var(--color-accent-600); }
+</style>

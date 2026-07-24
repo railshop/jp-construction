@@ -1,0 +1,597 @@
+---
+/**
+ * pages/services/[area]/[service].astro
+ *
+ * Combo pages — one unique page for every service × area combination.
+ * 
+ * With 8 services and 10 areas this generates 80 additional indexed pages,
+ * each targeting a specific "service in city" search query with content
+ * that is locally aware rather than templated.
+ *
+ * Content quality is driven by area.localContext in the data layer.
+ * The richer that context, the more genuinely unique the copy on each page.
+ * Claude Code should populate localContext when setting up a new client.
+ */
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProcessSteps from '../../../components/blocks/ProcessSteps.astro';
+import Testimonials from '../../../components/blocks/Testimonials.astro';
+import FaqAccordion from '../../../components/blocks/FaqAccordion.astro';
+import RelatedServices from '../../../components/blocks/RelatedServices.astro';
+import CtaBanner from '../../../components/blocks/CtaBanner.astro';
+import {
+  getBusiness,
+  getServices,
+  getServiceAreas,
+  getTestimonials,
+  generateComboContent,
+  generateComboFaqs,
+} from '../../../lib/data';
+import SeoServiceAreas from '../../../components/seo/SeoServiceAreas.astro';
+import config from '@/site.config';
+
+export async function getStaticPaths() {
+  const services = await getServices();
+  const areas    = await getServiceAreas();
+
+  // Generate every service × area combination
+  return services.flatMap(service =>
+    areas.map(area => ({
+      params: { area: area.slug, service: service.slug },
+    }))
+  );
+}
+
+const { area: areaSlug, service: serviceSlug } = Astro.params;
+
+const business     = await getBusiness();
+const services     = await getServices();
+const areas        = await getServiceAreas();
+const service      = services.find(s => s.slug === serviceSlug)!;
+const area         = areas.find(a => a.slug === areaSlug)!;
+const allTestimonials = await getTestimonials();
+
+// Filter testimonials to this area or service first, then fall back to featured
+const relevantTestimonials = allTestimonials
+  .filter(t => (t.area as unknown as string) === areaSlug || (t.service as unknown as string) === serviceSlug)
+  .slice(0, 3);
+const testimonials = relevantTestimonials.length >= 2
+  ? relevantTestimonials
+  : allTestimonials.filter(t => t.featured).slice(0, 3);
+
+// Generate locally-aware content
+const content  = generateComboContent(service, area, business);
+const comboFaqs = generateComboFaqs(service, area, business);
+
+// JSON-LD — LocalBusiness scoped to this city + Service
+const comboSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': config.schemaType,
+    name: business.name,
+    description: content.metaDescription,
+    telephone: business.phone,
+    url: `${config.siteUrl}/services/${area.slug}/${service.slug}/`,
+    areaServed: {
+      '@type': 'City',
+      name: area.name,
+      ...(area.county && { containedInPlace: { '@type': 'AdministrativeArea', name: area.county } }),
+    },
+    ...(area.lat && area.lng && {
+      geo: { '@type': 'GeoCoordinates', latitude: area.lat, longitude: area.lng },
+    }),
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: `${service.name} in ${area.name}`,
+      itemListElement: [{
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: service.name,
+          description: service.shortDescription,
+          areaServed: { '@type': 'City', name: area.name },
+          ...(service.priceRange && {
+            offers: {
+              '@type': 'Offer',
+              priceRange: `$${service.priceRange.min} - $${service.priceRange.max}`,
+              priceCurrency: 'USD',
+            },
+          }),
+        },
+      }],
+    },
+  },
+  // FAQPage schema using generated combo FAQs
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: comboFaqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  },
+];
+import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projectsUrl, serviceUrl, areaUrl, comboUrl, blogPostUrl, projectUrl } from '../../../lib/urls';
+---
+
+<BaseLayout seo={{
+  title: content.ogTitle,
+  description: content.metaDescription,
+  schema: comboSchema,
+  breadcrumbs: [
+    { name: 'Services', url: '/services/' },
+    { name: area.name, url: `/areas/${area.slug}/` },
+    { name: service.name, url: `/services/${area.slug}/${service.slug}/` },
+  ],
+}}>
+
+  <!-- Combo hero -->
+  <div class="combo-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href={homeUrl()}>Home</a>
+        <span aria-hidden="true">/</span>
+        <a href={servicesUrl()}>Services</a>
+        <span aria-hidden="true">/</span>
+        <a href={`/areas/${area.slug}/`}>{area.name}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{service.name}</span>
+      </nav>
+
+      {service.emergency && (
+        <div class="combo-badges">
+          <span class="badge badge-accent">24/7 Emergency</span>
+        </div>
+      )}
+
+      <h1 class="combo-headline section-title">{content.headline}</h1>
+      <p class="combo-subheadline">{content.subheadline}</p>
+
+      <div class="hero-actions">
+        <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
+        <a href={business.phoneHref} class="btn btn-ghost btn-lg">{business.phone}</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local intro — copy + area photo -->
+  <section class="combo-intro section">
+    <div class="container">
+      <div class="combo-intro-grid">
+        <div class="combo-intro-text">
+          <h2 class="combo-intro-heading">{service.shortDescription}</h2>
+          <p class="combo-intro-desc">{content.heroDescription}</p>
+          <ul class="combo-trust-list" aria-label="Why choose JP Construction">
+            <li class="combo-trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Licensed &amp; Insured
+            </li>
+            <li class="combo-trust-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Free Estimates
+            </li>
+            {service.emergency && (
+              <li class="combo-trust-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                24/7 Emergency Response
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div class="combo-intro-media">
+          {(area.image || service.image)
+            ? <img
+                src={area.image || service.image}
+                alt={`${area.name}, ${area.county || business.address.state}`}
+                loading="lazy"
+                width="800"
+                height="600"
+              />
+            : <div class="combo-intro-media-fallback" aria-hidden="true">
+                <span>{area.name}</span>
+              </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why local matters -->
+  {area.localContext && (
+    <section class="local-angle-section section">
+      <div class="container">
+
+        <!-- Header -->
+        <div class="local-angle-header">
+          <h2 class="section-title">{service.name} Built for {area.name} Properties</h2>
+        </div>
+
+        <!-- 2-col: prose left, challenges right -->
+        <div class="local-angle-grid">
+          <div class="local-prose-block">
+            <p class="local-angle-lead">{content.localAngle}</p>
+          </div>
+
+          {area.localContext.commonChallenges && area.localContext.commonChallenges.length > 0 && (
+            <div class="local-challenges-block">
+              <p class="local-block-label">Common challenges we address here</p>
+              <ul class="local-challenges-list" role="list">
+                {area.localContext.commonChallenges.map(challenge => (
+                  <li class="local-challenge-item">
+                    <span class="local-challenge-icon" aria-hidden="true">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </span>
+                    {challenge.charAt(0).toUpperCase() + challenge.slice(1)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <!-- Full-width bottom card: seasonal + features combined -->
+        {(area.localContext.seasonalFactors || (area.localContext.notableFeatures && area.localContext.notableFeatures.length > 0)) && (
+          <div class="local-bottom-card">
+            {area.localContext.seasonalFactors && (
+              <div class="local-bottom-seasonal">
+                <p class="local-block-label">Seasonal Considerations</p>
+                <p class="local-seasonal-text">{(s => s.endsWith('.') ? s : s + '.')(area.localContext.seasonalFactors!.charAt(0).toUpperCase() + area.localContext.seasonalFactors!.slice(1))}</p>
+              </div>
+            )}
+            {area.localContext.notableFeatures && area.localContext.notableFeatures.length > 0 && (
+              <div class="local-bottom-features">
+                <p class="local-block-label">Area Context</p>
+                <div class="local-features-strip">
+                  {area.localContext.notableFeatures.map(feature => (
+                    <span class="badge badge-neutral">{feature}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+    </section>
+  )}
+
+  <!-- Process steps -->
+  {service.processSteps?.length > 0 && (
+    <ProcessSteps
+      steps={service.processSteps}
+      eyebrow={`Our ${area.name} Process`}
+      title={`How We Handle ${service.name} in ${area.name}`}
+    />
+  )}
+
+  <!-- Combo FAQs -->
+  <FaqAccordion
+    faqs={comboFaqs}
+    eyebrow="FAQ"
+    title={`${service.name} in ${area.name}: Common Questions`}
+    includeSchema={false}
+    variant="dark"
+  />
+
+  <!-- Testimonials -->
+  {testimonials.length > 0 && (
+    <Testimonials
+      testimonials={testimonials}
+      businessName={business.name}
+      eyebrow="Local Reviews"
+      title={`What ${area.name} Customers Say`}
+    />
+  )}
+
+  <!-- All areas for this service — internal link mesh -->
+  <SeoServiceAreas
+    service={service}
+    areas={areas}
+    currentAreaSlug={areaSlug}
+  />
+
+  <!-- Related services -->
+  <RelatedServices
+    services={services}
+    currentSlug={service.slug}
+    title={`Other Services in ${area.name}`}
+    areaSlug={areaSlug}
+  />
+
+  <!-- Final CTA -->
+  <CtaBanner
+    headline={content.ctaHeadline}
+    subheadline={`Licensed, insured, and local to ${area.name}. Get your free estimate today.`}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
+    phone={business.phone}
+    phoneHref={business.phoneHref}
+    variant="brand"
+  />
+</BaseLayout>
+
+<style>
+  /* ── Hero ─────────────────────────────────────────────────────────────────── */
+  .combo-hero {
+    padding: var(--space-24) 0 var(--space-20);
+    background: linear-gradient(160deg, var(--color-brand-900) 0%, var(--color-brand-950) 100%);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-neutral-400);
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb a { color: var(--color-neutral-400); text-decoration: none; }
+  .breadcrumb a:hover { color: #ffffff; }
+  .breadcrumb span[aria-hidden] { color: var(--color-neutral-600); }
+
+  .combo-badges {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+  }
+
+  .combo-hero .section-eyebrow { color: var(--color-accent-500); }
+
+  .combo-headline {
+    color: #ffffff;
+    margin-top: var(--space-2);
+    max-width: 900px;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .combo-subheadline {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.65);
+    margin: var(--space-4) 0 0;
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  /* ── Local intro ─────────────────────────────────────────────────────────── */
+  .combo-intro {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .combo-intro-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .combo-intro-grid {
+      grid-template-columns: 55fr 45fr;
+      gap: var(--space-16);
+    }
+  }
+
+  .combo-intro-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .combo-intro-heading {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--color-text);
+    margin: var(--space-3) 0 var(--space-5);
+  }
+
+  .combo-intro-desc {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.75;
+    margin: 0 0 var(--space-6);
+  }
+
+  .combo-trust-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .combo-trust-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
+  .combo-trust-item svg {
+    color: var(--color-accent-500);
+    flex-shrink: 0;
+  }
+
+  .combo-intro-media {
+    position: relative;
+    min-height: 420px;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+  }
+
+  .combo-intro-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .combo-intro-media-fallback {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, var(--color-brand-800) 0%, var(--color-brand-900) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .combo-intro-media-fallback span {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: rgba(255,255,255,0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Why local matters ───────────────────────────────────────────────────── */
+  .local-angle-section {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .local-angle-header {
+    max-width: 720px;
+    margin-bottom: var(--space-10);
+  }
+
+  /* 2-col: prose left, challenges right */
+  .local-angle-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (min-width: 768px) {
+    .local-angle-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: start;
+    }
+  }
+
+  .local-prose-block {
+    padding-right: var(--space-4);
+  }
+
+  .local-angle-lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .local-block-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-subtle);
+    margin: 0 0 var(--space-4);
+  }
+
+  /* Challenges (right col) */
+  .local-challenges-block {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .local-challenges-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .local-challenge-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    line-height: 1.55;
+  }
+
+  .local-challenge-item:last-child { border-bottom: none; }
+
+  .local-challenge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-accent-500);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .local-challenge-icon svg { color: #ffffff; }
+
+  /* Bottom card: seasonal + features combined */
+  .local-bottom-card {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent-500);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .local-bottom-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: flex-start;
+    }
+  }
+
+  .local-bottom-seasonal .local-block-label,
+  .local-bottom-features .local-block-label {
+    margin-bottom: var(--space-3);
+  }
+
+  .local-seasonal-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .local-features-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

@@ -274,7 +274,7 @@ export function generateComboContent(
     metaDescription: [
       `${business.name} offers professional ${service.name.toLowerCase()} in ${area.name}, ${area.county || business.address.state}.`,
       ctx?.propertyCharacter ? `Specialized experience with ${ctx.propertyCharacter}.` : '',
-      `Licensed, insured. Free estimates. ${area.responseTime ? area.responseTime + ' response.' : 'Fast response.'}`,
+      `Licensed, insured. Free estimates.`,
     ].filter(Boolean).join(' ').slice(0, 158),
 
     ogTitle: `${service.name} in ${area.name} | ${business.name}`,
@@ -302,10 +302,8 @@ export function generateComboFaqs(
         : `Pricing for ${service.name.toLowerCase()} in ${area.name} depends on your property's specific needs. ${business.name} offers free estimates — contact us for an accurate quote.`,
     },
     {
-      question: `How quickly can ${business.name} respond in ${area.name}?`,
-      answer: area.responseTime
-        ? `We can typically reach ${area.name} within ${area.responseTime}. ${service.emergency ? 'We offer 24/7 emergency service for urgent situations.' : 'We schedule most jobs within the week and always confirm your appointment in advance.'}`
-        : `${business.name} serves ${area.name} as part of our regular service area. Contact us for current scheduling availability.`,
+      question: `Does ${business.name} regularly work in ${area.name}?`,
+      answer: `Yes. ${area.name} is part of our regular service area. ${service.emergency ? 'We offer 24/7 emergency service for urgent situations.' : 'We schedule most estimates within the week and always confirm your appointment in advance.'}`,
     },
     {
       question: `Is ${business.name} licensed and insured to work in ${area.name}?`,

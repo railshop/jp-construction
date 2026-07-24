@@ -96,7 +96,10 @@ for (const page of criticalPages) {
 
 section('Page Size Check');
 
-const emptyPages = allHtml.filter(f => fs.statSync(f).size < 500);
+// Redirect stubs (feature-flagged routes emit meta-refresh pages) are exempt
+const isRedirectStub = f => readHtml(f).includes('http-equiv="refresh"');
+
+const emptyPages = allHtml.filter(f => fs.statSync(f).size < 500 && !isRedirectStub(f));
 if (emptyPages.length === 0) {
   pass('All pages have content (>500 bytes)');
 } else {
@@ -188,8 +191,8 @@ let missingMeta = 0;
 let tooLongMeta = 0;
 const metaRegex = /<meta name="description" content="([^"]+)"/;
 
-// Sample 10 pages
-for (const htmlFile of allHtml.slice(0, 10)) {
+// Sample 10 pages (skip redirect stubs — they have no meta description by design)
+for (const htmlFile of allHtml.filter(f => !isRedirectStub(f)).slice(0, 10)) {
   const html = readHtml(htmlFile);
   const match = html.match(metaRegex);
   if (!match) {
