@@ -95,7 +95,7 @@ const config: SiteConfig = {
 
   siteUrl: 'https://buildwithjp.com',
   siteName: 'JP Construction',
-  siteDescription: 'Custom home building, additions, and general contracting in North Huntingdon and Westmoreland County, PA.',
+  siteDescription: 'Custom home building, additions, pole buildings, and commercial construction in North Huntingdon and Westmoreland County, PA.',
 
   features: {
     blog: false,
