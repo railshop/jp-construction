@@ -389,4 +389,16 @@ const jobSchema = {
     success.classList.remove('hidden');
     success.scrollIntoView({ block: 'center' });
   }
+
+  // Explicit scroll for the Apply anchor; native anchor jumps are unreliable
+  // on mobile when the body clips horizontal overflow
+  document.querySelectorAll<HTMLAnchorElement>('a[href="#apply"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const target = document.getElementById('apply');
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', '#apply');
+    });
+  });
 </script>

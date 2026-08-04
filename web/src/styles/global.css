@@ -146,7 +146,10 @@ body {
   color: var(--color-text);
   background-color: var(--color-bg);
   line-height: 1.65;
+  /* clip prevents horizontal overflow without creating a scroll container,
+     which would break in-page anchor links on mobile browsers */
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 ::selection {

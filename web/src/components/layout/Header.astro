@@ -26,6 +26,7 @@ const navLinks = [
   ...(config.features.projects     ? [{ label: 'Projects',      href: '/projects/', hasDropdown: false, dropdownId: '' }] : []),
   ...(config.features.blog         ? [{ label: 'Blog',          href: '/blog/',     hasDropdown: false, dropdownId: '' }] : []),
   { label: 'About',   href: '/about/',   hasDropdown: false, dropdownId: '' },
+  { label: 'Careers', href: '/careers/', hasDropdown: false, dropdownId: '' },
   { label: 'Contact', href: '/contact/', hasDropdown: false, dropdownId: '' },
 ];
 ---
@@ -169,41 +170,67 @@ const navLinks = [
     <nav aria-label="Mobile navigation">
       <ul role="list" class="mobile-nav-list">
 
-        <!-- Services with sub-items -->
+        <!-- Services: expandable section -->
         <li class="mobile-nav-section">
-          <a href={servicesUrl()} class:list={['mobile-nav-link mobile-nav-link--parent', { 'mobile-nav-link--active': currentPath.startsWith(servicesUrl()) }]}>
-            Services
-            <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </a>
+          <div class="mobile-nav-row">
+            <a href={servicesUrl()} class:list={['mobile-nav-link mobile-nav-link--parent', { 'mobile-nav-link--active': currentPath.startsWith(servicesUrl()) }]}>
+              Services
+            </a>
+            {services.length > 0 && (
+              <button
+                class="mobile-sub-toggle"
+                aria-expanded="false"
+                aria-controls="msub-services"
+                aria-label="Show services"
+                data-sub-toggle
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+            )}
+          </div>
           {services.length > 0 && (
-            <ul class="mobile-sub-list" role="list">
-              {services.map(service => (
-                <li>
-                  <a href={serviceUrl(service.slug)} class="mobile-sub-link">{service.name}</a>
-                </li>
-              ))}
-            </ul>
+            <div class="mobile-sub-wrap" id="msub-services">
+              <ul class="mobile-sub-list" role="list">
+                {services.map(service => (
+                  <li>
+                    <a href={serviceUrl(service.slug)} class="mobile-sub-link">{service.name}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </li>
 
-        <!-- Service Areas with sub-items -->
+        <!-- Service Areas: expandable section -->
         {config.features.serviceAreas && dropdownAreas.length > 0 && (
           <li class="mobile-nav-section">
-            <a href={areasUrl()} class:list={['mobile-nav-link mobile-nav-link--parent', { 'mobile-nav-link--active': currentPath.startsWith(areasUrl()) }]}>
-              Service Areas
-              <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </a>
-            <ul class="mobile-sub-list" role="list">
-              {dropdownAreas.map(area => (
-                <li>
-                  <a href={areaUrl(area.slug)} class="mobile-sub-link">{area.name}</a>
-                </li>
-              ))}
-            </ul>
+            <div class="mobile-nav-row">
+              <a href={areasUrl()} class:list={['mobile-nav-link mobile-nav-link--parent', { 'mobile-nav-link--active': currentPath.startsWith(areasUrl()) }]}>
+                Service Areas
+              </a>
+              <button
+                class="mobile-sub-toggle"
+                aria-expanded="false"
+                aria-controls="msub-areas"
+                aria-label="Show service areas"
+                data-sub-toggle
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+            </div>
+            <div class="mobile-sub-wrap" id="msub-areas">
+              <ul class="mobile-sub-list" role="list">
+                {dropdownAreas.map(area => (
+                  <li>
+                    <a href={areaUrl(area.slug)} class="mobile-sub-link">{area.name}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </li>
         )}
 
@@ -232,6 +259,15 @@ const navLinks = [
         <li>
           <a href="/about/" class:list={['mobile-nav-link', { 'mobile-nav-link--active': currentPath === '/about/' }]}>
             About
+            <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+        </li>
+
+        <li>
+          <a href="/careers/" class:list={['mobile-nav-link', { 'mobile-nav-link--active': currentPath.startsWith('/careers/') }]}>
+            Careers
             <svg class="mobile-nav-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
@@ -727,16 +763,72 @@ const navLinks = [
 
   .mobile-nav-section .mobile-nav-link {
     border-bottom: none;
+    flex: 1;
+  }
+
+  .mobile-nav-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .mobile-sub-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(245, 245, 244, 0.55);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+
+  .mobile-sub-toggle:hover { color: #ffffff; }
+
+  .mobile-sub-toggle svg {
+    transition: transform var(--transition-fast);
+  }
+
+  .mobile-sub-toggle[aria-expanded="true"] {
+    color: var(--color-accent-400);
+  }
+
+  .mobile-sub-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  /* Collapsible wrapper: closed by default, animates open */
+  .mobile-sub-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 300ms var(--ease-out-strong);
+  }
+
+  .mobile-sub-wrap.open {
+    grid-template-rows: 1fr;
+  }
+
+  .mobile-sub-wrap > .mobile-sub-list {
+    overflow: hidden;
+    min-height: 0;
   }
 
   .mobile-sub-list {
     list-style: none;
     margin: 0;
-    padding: 0 var(--space-2) var(--space-3);
+    padding: 0 var(--space-2);
     display: flex;
     flex-direction: column;
     gap: 2px;
     background: rgba(255, 255, 255, 0.03);
+  }
+
+  .mobile-sub-wrap.open > .mobile-sub-list {
+    padding-bottom: var(--space-3);
   }
 
   .mobile-sub-link {
@@ -829,6 +921,16 @@ const navLinks = [
   toggle.addEventListener('click', openDrawer);
   closeBtn.addEventListener('click', closeDrawer);
   overlay.addEventListener('click', closeDrawer);
+
+  // Expandable drawer sections (Services, Service Areas)
+  document.querySelectorAll<HTMLButtonElement>('[data-sub-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wrap = document.getElementById(btn.getAttribute('aria-controls')!);
+      if (!wrap) return;
+      const isOpen = wrap.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
 
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 10);
