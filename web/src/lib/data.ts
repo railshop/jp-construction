@@ -271,13 +271,9 @@ export function generateComboContent(
 
     ctaHeadline: `Need ${service.name} in ${area.name}?`,
 
-    metaDescription: [
-      `${business.name} offers professional ${service.name.toLowerCase()} in ${area.name}, ${area.county || business.address.state}.`,
-      ctx?.propertyCharacter ? `Specialized experience with ${ctx.propertyCharacter}.` : '',
-      `Licensed, insured. Free estimates.`,
-    ].filter(Boolean).join(' ').slice(0, 158),
+    metaDescription: `${service.name} in ${area.name}, ${business.address.state} from ${business.name}. Licensed and insured, with free estimates on every project.`.slice(0, 158),
 
-    ogTitle: `${service.name} in ${area.name} | ${business.name}`,
+    ogTitle: `${service.name} in ${area.name}, ${business.address.state}`,
   };
 }
 

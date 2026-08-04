@@ -23,7 +23,7 @@ const projectSchema = {
   '@context': 'https://schema.org',
   '@type': 'CreativeWork',
   name: project.title,
-  description: project.description,
+  description: `${project.description.split('. ')[0]}. A ${project.category.toLowerCase()} project by JP Construction.`.slice(0, 160),
   creator: { '@type': 'Organization', name: business.name },
   ...(project.completedDate && { dateCreated: project.completedDate }),
   ...(project.images[0] && { image: project.images[0] }),
@@ -33,7 +33,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
 <BaseLayout seo={{
   title: project.title,
-  description: project.description,
+  description: `${project.description.split('. ')[0]}. A ${project.category.toLowerCase()} project by JP Construction.`.slice(0, 160),
   ogImage: project.images[0],
   schema: projectSchema,
   breadcrumbs: [

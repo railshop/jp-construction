@@ -22,6 +22,9 @@ const jobSchema = {
   '@type': 'JobPosting',
   title: job.title,
   description: job.about,
+  datePosted: '2026-08-04',
+  validThrough: '2027-02-01',
+  directApply: true,
   employmentType: 'FULL_TIME',
   hiringOrganization: {
     '@type': 'Organization',
@@ -43,8 +46,8 @@ const jobSchema = {
 ---
 
 <BaseLayout seo={{
-  title: `${job.title} at ${job.company}`,
-  description: `${job.summary} Apply now: full-time, based in ${job.location}.`,
+  title: `${job.title} Job Opening`,
+  description: `${job.summary} Apply now.`,
   schema: jobSchema,
   breadcrumbs: [
     { name: 'Careers', url: '/careers/' },
