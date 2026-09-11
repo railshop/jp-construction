@@ -43,3 +43,6 @@ studio/dist/
 
 # TypeScript
 *.tsbuildinfo
+
+# Client source photos (originals, not for the build)
+source-photos/

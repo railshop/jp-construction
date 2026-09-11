@@ -7,6 +7,7 @@ export default {
     { name: 'title',         type: 'string', title: 'Project Title',      validation: (R: any) => R.required() },
     { name: 'slug',          type: 'slug',   title: 'Slug',               options: { source: 'title' }, validation: (R: any) => R.required() },
     { name: 'description',   type: 'text',   title: 'Short Description',  rows: 3, validation: (R: any) => R.required() },
+    { name: 'summary',       type: 'text',   title: 'SEO Summary (140-160 chars, used for meta description)', rows: 2, validation: (R: any) => R.max(160) },
     { name: 'category',      type: 'string', title: 'Category (e.g. Landscaping, Hardscape)', validation: (R: any) => R.required() },
     { name: 'clientName',    type: 'string', title: 'Client Name (e.g. "The Hartmann Family")' },
     { name: 'location',      type: 'string', title: 'Location (City, State)' },

@@ -96,6 +96,8 @@ export interface Project {
   slug: string;
   title: string;
   description: string;
+  /** One-line summary, 140-160 chars. Used for the meta description and OG text. */
+  summary?: string;
   category: string;
   clientName?: string;
   completedDate?: string;

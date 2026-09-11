@@ -88,6 +88,8 @@ const {
 
   @media (min-width: 768px) {
     .ba-grid { grid-template-columns: repeat(2, 1fr); }
+    /* A single comparison gets the full column width, centered */
+    .ba-grid:has(> .ba-slider:only-child) { grid-template-columns: 1fr; max-width: 900px; margin-inline: auto; }
   }
 
   .ba-slider {
