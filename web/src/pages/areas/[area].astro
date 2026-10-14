@@ -60,7 +60,12 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 }}>
 
   <!-- Area hero -->
-  <div class="area-hero">
+  <div
+    class="area-hero"
+    style={area.image
+      ? `background-image: linear-gradient(to right, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.68) 55%, rgba(10,10,10,0.35) 100%), linear-gradient(to top, rgba(10,10,10,0.55) 0%, transparent 50%), url('${area.image}'); background-size: cover; background-position: center;`
+      : undefined}
+  >
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href={homeUrl()}>Home</a>
@@ -163,7 +168,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
   <CtaBanner
     headline={`Need Service in ${area.name}?`}
-    subheadline={`We're local and ready to help. Call or request a free quote online.`}
+    subheadline={`Call or send us the details. Estimates are free.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -174,9 +179,12 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 <style>
   /* ── Hero ─────────────────────────────────────────────────────────────────── */
   .area-hero {
+    position: relative;
+    overflow: hidden;
     padding: var(--space-24) 0 var(--space-20);
     background: linear-gradient(160deg, var(--color-brand-900) 0%, var(--color-brand-950) 100%);
   }
+
 
   .breadcrumb {
     display: flex;

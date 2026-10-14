@@ -2,7 +2,7 @@
   "name": "railshop-starter-service",
   "private": true,
   "version": "1.0.0",
-  "description": "Railshop starter repo for local service business websites. Astro 5 + Sanity + Netlify.",
+  "description": "JP Construction website. Astro 5 + Netlify, local data mode.",
   "scripts": {
     "dev": "npm run dev --workspace=web",
     "build": "npm run build --workspace=web",

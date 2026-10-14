@@ -65,11 +65,15 @@ if (breadcrumbSchema) schemas.push(breadcrumbSchema);
 <title>{fullTitle}</title>
 <meta name="description" content={seo.description} />
 <link rel="canonical" href={canonical} />
+{config.googleSiteVerification && <meta name="google-site-verification" content={config.googleSiteVerification} />}
 {seo.noindex && <meta name="robots" content="noindex, nofollow" />}
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="theme-color" content="#1a1a1a" />
 
 <!-- Open Graph -->
 <meta property="og:type"        content={seo.ogType || 'website'} />

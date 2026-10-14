@@ -231,45 +231,34 @@ export function generateComboContent(
   business: Business
 ): ComboContent {
   const ctx = area.localContext;
+  const svc = service.name.toLowerCase().replace(' & ', ' and ');
+  const since = business.yearEstablished ? `since ${business.yearEstablished}` : 'for years';
   const years = business.yearEstablished
     ? new Date().getFullYear() - business.yearEstablished
     : null;
 
-  // Build local angle from context if available, fall back to generic
-  const seasonalAngle = ctx?.seasonalFactors
-    ? ctx.seasonalFactors
-    : `seasonal conditions in the ${area.county || area.name} area`;
-
-  const communityAngle = ctx?.communityType
-    ? `${area.name}'s ${ctx.communityType}`
-    : area.name;
-
-  const landmarkAngle = ctx?.landmarks?.length
-    ? ` near ${ctx.landmarks[0]}`
-    : '';
+  const challenges = (ctx?.commonChallenges ?? []).map(c => c.replace(/\.$/, ''));
 
   return {
     headline: `${service.name} in ${area.name}, ${business.address.state}`,
 
-    subheadline: `Professional ${service.name.toLowerCase()} in ${area.name}, ${business.address.state}. Licensed, insured, and locally based, with free estimates on every project.`,
+    subheadline: `${business.name} does ${svc} in ${area.name} and the rest of ${area.county || 'the area'}. Licensed and insured, with free estimates.`,
 
-    heroDescription: years
-      ? `${business.name} has delivered ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle} for ${years}+ years. Every project is managed start to finish: on-site, on schedule, and built to the standard your property deserves.`
-      : `${business.name} delivers ${service.name.toLowerCase()} across ${communityAngle}${landmarkAngle}. Every project is managed start to finish: on-site, on schedule, and built to the standard your property deserves.`,
+    heroDescription: `${area.description.replace(/\s+$/, '')} We have been doing ${svc} here ${since}, and the same project manager runs your job from the first site visit to the final inspection.`,
 
-    localAngle: ctx?.commonChallenges?.length
-      ? `We've completed projects throughout ${area.name} and know the conditions that affect ${service.name.toLowerCase()} quality here firsthand, from ${ctx.commonChallenges[0].toLowerCase().split(' ').slice(0, 6).join(' ')} to permit timelines with ${area.county || 'local'} offices. That knowledge shapes every decision we make on your project.`
-      : `We've worked throughout ${area.name} and understand the specific site conditions, permit requirements, and construction challenges that affect ${service.name.toLowerCase()} quality and longevity here.`,
+    localAngle: challenges.length >= 2
+      ? `A few things come up again and again on ${area.name} jobs: ${challenges[0]}, and ${challenges[1]}. We plan for both before we price the work, and we know what the local building department wants to see on a permit application, which keeps the review from dragging on.`
+      : challenges.length === 1
+        ? `One thing that comes up often on ${area.name} jobs is ${challenges[0]}. We plan for it before we price the work, and we know what the local building department wants to see on a permit application.`
+        : `We have worked in ${area.name} long enough to know the site conditions and permit requirements that affect ${svc} here.`,
 
     whyUsLocal: years
       ? `${years}+ years serving ${business.serviceRadius || business.address.city}`
-      : `Experienced local contractor serving ${area.name} and surrounding communities`,
+      : `Local contractor serving ${area.name} and surrounding communities`,
 
-    processIntro: ctx?.seasonalFactors
-      ? `${seasonalAngle} shapes how we approach every ${service.name.toLowerCase()} project in ${area.name}. Here's our process:`
-      : `Here's how we handle every ${service.name.toLowerCase()} project in ${area.name}:`,
+    processIntro: `Here is how we run a ${svc} job in ${area.name}:`,
 
-    faqIntro: `Common questions from ${area.name} customers about our ${service.name.toLowerCase()} service:`,
+    faqIntro: `Questions we get from ${area.name} customers about ${svc}:`,
 
     ctaHeadline: `Need ${service.name} in ${area.name}?`,
 
@@ -296,20 +285,20 @@ export function generateComboFaqs(
     {
       question: `How much does ${service.name.toLowerCase()} cost in ${area.name}?`,
       answer: service.priceRange
-        ? `${service.name} in ${area.name} typically ranges from $${service.priceRange.min.toLocaleString()} to $${service.priceRange.max.toLocaleString()} depending on the scope of work, property size, and site conditions. ${business.name} provides free, detailed estimates with no obligation.`
+        ? `Most ${service.name.toLowerCase()} jobs in ${area.name} run from $${service.priceRange.min.toLocaleString()} to $${service.priceRange.max.toLocaleString()} depending on scope, size, and site conditions. We will come out, look at the property, and give you a written estimate at no charge.`
         : `Pricing for ${service.name.toLowerCase()} in ${area.name} depends on your property's specific needs. ${business.name} offers free estimates, so contact us for an accurate quote.`,
     },
     {
       question: `Does ${business.name} regularly work in ${area.name}?`,
-      answer: `Yes. ${area.name} is part of our regular service area. ${service.emergency ? 'We offer 24/7 emergency service for urgent situations.' : 'We schedule most estimates within the week and always confirm your appointment in advance.'}`,
+      answer: `Yes. ${area.name} is part of our regular service area. ${service.emergency ? 'We offer 24/7 emergency service for urgent situations.' : 'We can usually get out for an estimate within the week.'}`,
     },
     {
       question: `Is ${business.name} licensed and insured to work in ${area.name}?`,
-      answer: `Yes. ${business.name} is ${business.license ? business.license + ' and is' : ''} fully insured${years ? ` with ${years}+ years of experience` : ''} serving ${area.county || area.name}. We carry full liability insurance and workers' compensation coverage on every job.`,
+      answer: `Yes. ${business.name} is licensed in Pennsylvania and carries general liability and workers' compensation coverage on every job${years ? `. We have been working in ${area.county || area.name} since ${business.yearEstablished}` : ''}.`,
     },
     ...(ctx?.commonChallenges?.length ? [{
       question: `What are the biggest ${service.name.toLowerCase()} challenges for ${area.name} properties?`,
-      answer: `${area.name} properties commonly face ${ctx.commonChallenges.slice(0, 2).join(' and ')}. ${ctx.seasonalFactors ? ctx.seasonalFactors + '.' : ''} Our team has direct experience with these local conditions and plans every project accordingly.`,
+      answer: `Two we see often: ${ctx.commonChallenges.slice(0, 2).join(', and ')}.${ctx.seasonalFactors ? ' ' + ctx.seasonalFactors.charAt(0).toUpperCase() + ctx.seasonalFactors.slice(1).replace(/\.$/, '') + '.' : ''} We plan for these before we price the job.`,
     }] : []),
     {
       question: `Do you serve areas near ${area.name}?`,
@@ -317,7 +306,7 @@ export function generateComboFaqs(
     },
     ...(ctx?.permitNotes ? [{
       question: `Do I need a permit for ${service.name.toLowerCase()} in ${area.name}?`,
-      answer: `${ctx.permitNotes} ${business.name} is familiar with local requirements and can help navigate the process as part of your project.`,
+      answer: `${ctx.permitNotes.replace(/\.$/, '')}. We handle the permit application and the inspections as part of the job.`,
     }] : []),
   ];
 }

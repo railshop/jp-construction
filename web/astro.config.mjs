@@ -17,10 +17,16 @@ export default defineConfig({
 
   integrations: [
     sitemap({
+      // Keep noindex and redirect-only routes out of the sitemap
       filter: (page) =>
         !page.includes('/admin/') &&
         !page.includes('/api/') &&
-        !page.includes('/draft/'),
+        !page.includes('/draft/') &&
+        !page.includes('/lp/') &&
+        !page.includes('/blog/') &&
+        !page.includes('/privacy/') &&
+        !page.includes('/credits/') &&
+        !page.includes('/404'),
       changefreq: 'weekly',
       priority: 0.7,
       customPages: [],

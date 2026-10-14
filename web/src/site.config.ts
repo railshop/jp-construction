@@ -75,6 +75,8 @@ export interface SiteConfig {
   // Analytics
   ga4Id?: string;
   gtmId?: string;
+  /** Google Search Console HTML-tag verification token (content value only) */
+  googleSiteVerification?: string;
 
   // Integrations
   googleMapsApiKey?: string;
@@ -101,15 +103,16 @@ const config: SiteConfig = {
     blog: false,
     projects: true,
     serviceAreas: true,
-    teamMembers: true,
+    teamMembers: false,
     emergencyBanner: false,
     beforeAfterSlider: true,
     financing: false,
     campaignLandingPages: false,
   },
 
-  ga4Id: undefined,
-  gtmId: undefined,
+  ga4Id: undefined,                 // 'G-XXXXXXXXXX' from GA4 > Admin > Data Streams
+  gtmId: undefined,                 // 'GTM-XXXXXXX' if using Tag Manager instead
+  googleSiteVerification: undefined, // token from Search Console > Settings > Ownership verification > HTML tag
   googleMapsApiKey: undefined,
   hubspotPortalId: undefined,
 };

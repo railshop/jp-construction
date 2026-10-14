@@ -25,9 +25,9 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
 
   <div class="page-hero">
     <div class="container">
-      <h1 class="section-title">Same Crew.<br/>Wherever You Are.</h1>
+      <h1 class="section-title">Where We Work</h1>
       <p class="section-subtitle">
-        Based in North Huntingdon, we cover Westmoreland County and the surrounding region. Wherever you are, you get the same crew, the same standards, and the same accountability.
+        We are based in North Huntingdon and work throughout Westmoreland County, with regular jobs in the communities below. If you are nearby but not listed, call. We probably cover it.
       </p>
       <div class="hero-actions">
         <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
@@ -103,7 +103,7 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
       <div class="services-strip-header">
         <div>
           <h2 class="services-strip-title">Every Service, Every Area</h2>
-          <p class="services-strip-sub">Wherever you are in our coverage area, you get our full range of services: the same crew, the same standards, and the same commitment to getting it right.</p>
+          <p class="services-strip-sub">Every service we offer is available in every community listed above.</p>
         </div>
         <a href="/services/" class="services-strip-link">
           View all services
@@ -135,7 +135,7 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
 
   <CtaBanner
     headline="Don't See Your Area?"
-    subheadline="Give us a call. We may still be able to serve you."
+    subheadline="Call us. We take jobs outside the listed areas when the project makes sense."
     primaryCta={{ label: 'Contact Us', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -155,7 +155,7 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/area-north-huntingdon.jpg');
+    background-image: url('/images/hero-areas.jpg');
     background-size: cover;
     background-position: center 60%;
   }

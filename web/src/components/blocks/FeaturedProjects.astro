@@ -24,7 +24,7 @@ interface Props {
 const {
   projects,
   eyebrow = 'Our Work',
-  title = 'Built to Show For',
+  title = 'Recent Projects',
   subtitle,
   viewAllHref = '/projects/',
 } = Astro.props;
@@ -180,6 +180,7 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
 
   .fp-hero,
   .fp-card {
+    border: 0;
     position: relative;
     display: block;
     text-decoration: none;
@@ -225,16 +226,17 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
     inset: 0;
     background: linear-gradient(
       to top,
-      rgba(10, 10, 10, 0.90) 0%,
-      rgba(10, 10, 10, 0.35) 45%,
-      rgba(10, 10, 10, 0.06) 100%
+      rgba(10, 10, 10, 0.94) 0%,
+      rgba(10, 10, 10, 0.72) 22%,
+      rgba(10, 10, 10, 0.18) 48%,
+      rgba(10, 10, 10, 0.04) 100%
     );
     transition: opacity var(--transition-base);
   }
 
   .fp-hero:hover .fp-overlay,
   .fp-card:hover .fp-overlay {
-    opacity: 0.82;
+    opacity: 0.9;
   }
 
   /* ─── Text body (absolute, bottom of each card) ──────────────────────────── */
@@ -293,7 +295,7 @@ const duocards  = projects.filter(p => p.slug !== featured?.slug).slice(0, 2);
     align-items: center;
     gap: 4px;
     font-size: var(--text-xs);
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.7);
     margin: 0;
   }
 

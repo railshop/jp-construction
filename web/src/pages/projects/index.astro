@@ -15,15 +15,15 @@ const projects = await getProjects();
 
 <BaseLayout seo={{
   title: `Our Work | Projects & Portfolio`,
-  description: `Browse completed projects by ${business.name}. Real work, real results for homeowners and businesses in ${business.address.city} and surrounding areas.`,
+  description: `Completed projects by ${business.name}: custom homes, additions, garages, commercial renovations, and whole-property restorations across Westmoreland County.`,
   breadcrumbs: [{ name: 'Projects', url: '/projects/' }],
 }}>
 
   <div class="page-hero">
     <div class="container">
-      <h1 class="section-title">Real Work.<br/>Real Results.</h1>
+      <h1 class="section-title">Our Work</h1>
       <p class="section-subtitle">
-        Every project shown here was built and managed by JP Construction from first site visit to final walkthrough. The work speaks for itself.
+        Projects JP Construction built and managed, with photos from the job. Scopes range from a ceiling renovation to whole-property rebuilds.
       </p>
       <div class="hero-actions">
         <a href={contactUrl()} class="btn btn-primary btn-lg">Start Your Project</a>
@@ -43,6 +43,7 @@ const projects = await getProjects();
     : (
       <ProjectGallery
         projects={projects}
+        title="All Projects"
         showFilter={true}
         showViewAll={false}
         columns={3}
@@ -51,8 +52,8 @@ const projects = await getProjects();
   }
 
   <CtaBanner
-    headline="Like What You See?"
-    subheadline="Get in touch for a free estimate on your project."
+    headline="Planning Something Similar?"
+    subheadline="Send us the details and we will schedule a site visit."
     primaryCta={{ label: 'Start Your Project', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -72,7 +73,7 @@ const projects = await getProjects();
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/projects/morris-avenue/morris-avenue-01.jpg');
+    background-image: url('/images/hero-projects.jpg');
     background-size: cover;
     background-position: center 55%;
   }

@@ -35,7 +35,6 @@ const business = await getBusiness();
         {jobs.map((job, i) => (
           <li class:list={['reveal', `reveal-d${Math.min(i % 3 + 1, 5)}`]}>
             <a href={`/careers/${job.slug}/`} class="job-row">
-              <span class="job-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <span class="job-main">
                 <span class="job-title">{job.title}</span>
                 <span class="job-summary">{job.summary}</span>
@@ -62,7 +61,7 @@ const business = await getBusiness();
 
   <CtaBanner
     headline="Know Someone Who Fits?"
-    subheadline="Pass this page along. Good crews are built on good referrals."
+    subheadline="Pass this page along. Most of our hires come from people already on the crew."
     primaryCta={{ label: 'View Open Roles', href: '/careers/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -82,7 +81,7 @@ const business = await getBusiness();
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/about-team.jpg');
+    background-image: url('/images/hero-careers.jpg');
     background-size: cover;
     background-position: center 40%;
   }
@@ -134,15 +133,6 @@ const business = await getBusiness();
   .job-row:hover {
     background: var(--color-bg-subtle);
     padding-left: var(--space-4);
-  }
-
-  .job-num {
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--color-text-subtle);
-    font-variant-numeric: tabular-nums;
-    flex-shrink: 0;
   }
 
   .job-main {
@@ -234,9 +224,7 @@ const business = await getBusiness();
       gap: var(--space-3);
     }
 
-    .job-num { display: none; }
-
-    .job-main { flex-basis: 100%; }
+      .job-main { flex-basis: 100%; }
 
     .job-meta {
       flex-direction: row;

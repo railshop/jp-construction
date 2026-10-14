@@ -15,11 +15,7 @@
   to     = "/"
   status = 301
 
-# SPA fallback (not needed for static, but safe to include)
-[[redirects]]
-  from   = "/*"
-  to     = "/404/index.html"
-  status = 404
+# Custom 404: Netlify serves dist/404.html automatically for unmatched routes.
 
 # Netlify Forms — no extra config needed, forms are auto-detected
 # from data-netlify="true" attributes in HTML

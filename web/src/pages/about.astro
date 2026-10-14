@@ -42,8 +42,9 @@ const aboutSchema = {
     <div class="container">
       <h1 class="section-title">Family Owned.<br/>Field Proven.</h1>
       <p class="section-subtitle">
-        Since {business.yearEstablished || '2015'}, JP Construction has built a reputation on quality craftsmanship,
-        reliable timelines, and results that speak for themselves. No excuses. Just solid work done right.
+        JP Construction has been building in Westmoreland County since {business.yearEstablished || '2015'}.
+        We are the construction side of JP Operations, which means the people digging your foundation
+        and the people framing on it work for the same company.
       </p>
       <div class="hero-actions">
         <a href={contactUrl()} class="btn btn-primary btn-lg">Get an Estimate</a>
@@ -86,26 +87,26 @@ const aboutSchema = {
       <div class="owners-grid">
 
         <div class="owners-text">
-          <h2 class="owners-title">A family business built on craftsmanship and accountability.</h2>
+          <h2 class="owners-title">One family company, from the excavator to the trim nailer.</h2>
           <p class="owners-bio">
-            JP Construction is a family-owned business built on a straightforward premise: when you hire us,
-            you get a team that treats your project with the same care they'd bring to their own home.
-            Founded in {business.yearEstablished || '2015'}, we've built our reputation one project at a time,
-            through quality work, honest communication, and consistent standards from first site visit to final walkthrough.
+            JP Construction is family owned and based in North Huntingdon. We started in {business.yearEstablished || '2015'}
+            and have grown mostly on referrals from people whose houses, garages, and buildings we have already worked on.
+            You deal with the same project manager from the estimate to the final walkthrough, and if something
+            changes on the job, you hear about it from us first.
           </p>
           <p class="owners-bio">
             JP Construction operates as the residential and commercial construction division of
             <a href="https://www.jpoperations.com/" target="_blank" rel="noopener noreferrer" class="owners-link">JP Operations</a>,
-            an established excavation, site work, and civil concrete contractor serving Western Pennsylvania.
-            That relationship means site preparation, grading, and foundation work aren't handed off to a stranger.
-            They're handled in-house, by a crew that operates to the same standard on every job.
+            an excavation, site work, and civil concrete contractor that has worked across Western Pennsylvania for years.
+            On most of our jobs that means the grading, foundation prep, and utilities are done by our own crews
+            and our own equipment instead of being subbed out to someone we have never worked with.
           </p>
         </div>
 
         <div class="owners-image-col">
           <div class="owners-image-wrap">
             <img
-              src="/images/svc-design.jpg"
+              src="/images/about-crew.jpg"
               alt="JP Construction crew on a job site in Westmoreland County, PA"
               loading="lazy"
               width="800"
@@ -130,32 +131,32 @@ const aboutSchema = {
           {
             icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`,
             title: 'Licensed & Fully Insured',
-            body: 'Every job is covered. We carry full general liability and workers\' comp, so your home and your investment are protected from day one.',
+            body: 'We carry general liability and workers\' comp on every job. Certificates of insurance are available on request.',
           },
           {
             icon: `<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>`,
-            title: 'Honest, Itemized Estimates',
-            body: 'No vague quotes. No bait-and-switch. You get a clear, line-item estimate before any work begins, and we stick to it.',
+            title: 'Written, Line-Item Estimates',
+            body: 'You get an itemized estimate in writing before any work starts. If conditions change, you get a written change order to approve before we proceed, not a surprise on the invoice.',
           },
           {
             icon: `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
-            title: 'On-Time, Every Time',
-            body: 'We schedule carefully and staff appropriately. If something changes, you hear it from us first, before you notice it yourself.',
+            title: 'Schedules We Can Keep',
+            body: 'We do not start a job we cannot staff. If weather or a supplier pushes a date, you hear it from us the same day.',
           },
           {
             icon: `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,
-            title: 'Dedicated Project Management',
-            body: 'Every project has a consistent point of contact from first site visit through final walkthrough. You always know who to call, and they always know where your project stands.',
+            title: 'One Project Manager',
+            body: 'The person who walks the site with you on day one runs the job to the end. You always know who to call, and they always know where things stand.',
           },
           {
             icon: `<polyline points="20 6 9 17 4 12"/>`,
-            title: 'Satisfaction Guaranteed',
-            body: 'We don\'t consider a job done until you\'re genuinely satisfied. If something\'s not right, we fix it. No arguments, no invoices.',
+            title: 'We Fix What Is Not Right',
+            body: 'If something is off at the walkthrough, we fix it. That is part of the job, not an extra.',
           },
           {
             icon: `<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>`,
-            title: 'Rooted in This Community',
-            body: `${yearsInBusiness ? yearsInBusiness + '+ years' : 'Years'} in Westmoreland County. We live here. We build here. Our reputation is on the line on every street we work.`,
+            title: 'Based Here',
+            body: `${yearsInBusiness ? yearsInBusiness + ' years' : 'Years'} in Westmoreland County. Our crews live in the same townships we build in, and most of our work comes from people who know someone we have built for.`,
           },
         ].map(item => (
           <li class="why-card">
@@ -178,7 +179,7 @@ const aboutSchema = {
   <!-- Standard bottom CTA -->
   <CtaBanner
     headline={`Start Your Project with ${business.name}`}
-    subheadline="Get your free estimate today. No pressure, no obligation."
+    subheadline="Call or send a message and we will set up a site visit. Estimates are free."
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
@@ -200,7 +201,7 @@ const aboutSchema = {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/about-team.jpg');
+    background-image: url('/images/hero-about.jpg');
     background-size: cover;
     background-position: center 35%;
   }

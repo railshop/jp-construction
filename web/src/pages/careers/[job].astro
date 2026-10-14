@@ -192,7 +192,12 @@ const jobSchema = {
 <style>
   .job-hero {
     padding: var(--space-24) 0 var(--space-16);
-    background: linear-gradient(160deg, var(--color-brand-900) 0%, var(--color-brand-950) 100%);
+    background-image:
+      linear-gradient(to right, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.68) 55%, rgba(10,10,10,0.35) 100%),
+      linear-gradient(to top, rgba(10,10,10,0.55) 0%, transparent 50%),
+      url('/images/hero-careers.jpg');
+    background-size: cover;
+    background-position: center 40%;
   }
 
   .breadcrumb {

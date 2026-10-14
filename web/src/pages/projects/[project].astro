@@ -203,7 +203,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
             .slice(0, 3)
             .map(p => (
             <li>
-              <a href={`/projects/${p.slug}/`} class="more-project-card">
+              <a href={`/projects/${p.slug}/`} class="more-project-card card">
                 <div class="more-project-image">
                   {p.images[0]
                     ? <img src={p.images[0]} alt={p.title} loading="lazy" width="600" height="400" />
@@ -217,15 +217,6 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
                       </div>
                     )
                   }
-                  <div class="more-project-overlay">
-                    <span class="more-project-view">
-                      View Project
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                      </svg>
-                    </span>
-                  </div>
                 </div>
                 <div class="more-project-body">
                   <p class="more-project-category">{p.category}</p>
@@ -239,6 +230,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
                       {p.location}
                     </p>
                   )}
+                  <span class="more-project-cta" aria-hidden="true">View Project <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                 </div>
               </a>
             </li>
@@ -534,8 +526,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
   .more-projects-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 
-  .more-project-card { display: block; text-decoration: none; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base); }
-  .more-project-card:hover { box-shadow: 0 12px 40px rgb(0 0 0 / 0.12); transform: translateY(-4px); border-color: var(--color-accent-500); }
+  .more-project-card { display: flex; flex-direction: column; height: 100%; text-decoration: none; }
 
   .more-project-image { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--color-brand-950); }
   .more-project-image img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-slow); display: block; }
@@ -543,12 +534,29 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
   .more-project-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); }
 
-  .more-project-overlay { position: absolute; inset: 0; background: color-mix(in srgb, var(--color-brand-950) 75%, transparent); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-base); }
-  .more-project-card:hover .more-project-overlay { opacity: 1; }
 
-  .more-project-view { display: flex; align-items: center; gap: var(--space-2); color: #ffffff; font-weight: 700; font-size: var(--text-sm); letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid var(--color-accent-500); padding-bottom: 2px; }
+  .more-project-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-brand-950);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    transition: gap var(--transition-fast), color var(--transition-fast);
+  }
+  .more-project-card:hover .more-project-cta {
+    gap: var(--space-3);
+    color: var(--color-accent-500);
+  }
 
-  .more-project-body { padding: var(--space-4) var(--space-5); background: var(--color-bg); }
+  .more-project-body { display: flex; flex-direction: column; flex: 1; padding: var(--space-4) var(--space-5); background: var(--color-bg); }
+  .more-project-cta { margin-top: auto; }
   .more-project-category { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-accent-500); margin: 0 0 var(--space-1); }
   .more-project-title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700; color: var(--color-text); margin: 0 0 var(--space-2); line-height: 1.2; }
   .more-project-location { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); color: var(--color-text-subtle); margin: 0; }

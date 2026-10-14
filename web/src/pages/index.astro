@@ -103,7 +103,7 @@ const localBusinessSchema = {
 
   <Hero
     headline={`Built Right.<br><em>Built to Last.</em>`}
-    subheadline={`Custom homes, additions, pole buildings, and commercial construction across Westmoreland County. One crew, one point of contact, no surprises.`}
+    subheadline={`A North Huntingdon general contractor building custom homes, additions, pole buildings, and commercial space across Westmoreland County.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     secondaryCta={{ label: 'View Our Work', href: '/projects/' }}
     backgroundImage="/images/hero-home.jpg"
@@ -130,15 +130,15 @@ const localBusinessSchema = {
   <ServiceCardsGrid
     services={services}
     title="What We Build"
-    subtitle={`Six services, one standard of work. Every project is managed start to finish by the same team.`}
+    subtitle={`Residential and commercial. The same project manager runs your job from the first site visit to the final inspection, whatever the scope.`}
   />
 
   <!-- Featured Projects -->
   {config.features.projects && projects.length > 0 && (
     <FeaturedProjects
       projects={projects}
-      title="Built to Show For"
-      subtitle={`Real projects and real results across Westmoreland County and beyond.`}
+      title="Recent Projects"
+      subtitle={`A few of the jobs we have finished around Westmoreland County.`}
     />
   )}
 
@@ -166,9 +166,9 @@ const localBusinessSchema = {
 
   <!-- Final CTA -->
   <CtaBanner
-    headline="Let's Get Started"
-    subheadline={`Serving ${business.serviceRadius || business.address.city}. Get your free estimate today.`}
-    primaryCta={{ label: 'Contact Us Today', href: '/contact/' }}
+    headline="Have a Project in Mind?"
+    subheadline={`Tell us what you are planning. We will come out, take a look, and put a number on it. Estimates are free.`}
+    primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
     variant="dark"

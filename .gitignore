@@ -37,10 +37,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Sanity
-studio/.sanity/
-studio/dist/
-
 # TypeScript
 *.tsbuildinfo
 

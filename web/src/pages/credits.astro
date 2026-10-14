@@ -1,0 +1,124 @@
+---
+/**
+ * pages/credits.astro — Photo credits
+ *
+ * Attribution for Creative Commons photography used on the service area pages.
+ * CC BY and CC BY-SA licenses require title, author, source, and license to be
+ * credited. Update this list whenever an area photo changes.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getBusiness } from '../lib/data';
+const business = await getBusiness();
+---
+
+<BaseLayout seo={{
+  title: 'Photo Credits',
+  description: `Photo credits and attribution for Creative Commons photography used on the ${business.name} website.`,
+  breadcrumbs: [{ name: 'Photo Credits', url: '/credits/' }],
+  noindex: true,
+}}>
+
+  <div class="credits-page">
+    <div class="container container--narrow">
+      <header class="credits-header">
+        <h1 class="credits-title">Photo Credits</h1>
+        <p class="credits-intro">
+          Project and crew photography on this site is the property of {business.legalName || business.name}.
+          The service area photographs below are used under Creative Commons licenses and are credited to their photographers.
+        </p>
+      </header>
+
+      <section class="credits-section" aria-labelledby="area-credits-heading">
+        <h2 id="area-credits-heading">Service Area Photography</h2>
+        <ul class="credit-list" role="list">
+          <li class="credit">
+            <span class="credit-area">North Huntingdon</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3ANorth_Huntingdon%2C_Pennsylvania_20250420.jpg" target="_blank" rel="noopener">North Huntingdon, Pennsylvania 20250420</a> by Designism,
+              <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Irwin</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3AIrwin%2C_Pennsylvania.jpg" target="_blank" rel="noopener">Irwin, Pennsylvania</a> by André Carrotflower,
+              <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener">CC BY-SA 2.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Greensburg</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3A45_-_20180728_-_Greensburg%2C_PA.jpg" target="_blank" rel="noopener">45 - 20180728 - Greensburg, PA</a> by Andre Carrotflower,
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Trafford</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3ACavitt_Avenue_Trafford_2013.jpg" target="_blank" rel="noopener">Cavitt Avenue Trafford 2013</a> by Canadian2006,
+              <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Murrysville</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3AMurraysville_Westmoreland_Co%2C_PA.jpg" target="_blank" rel="noopener">Murraysville Westmoreland Co, PA</a> by Erik Drost,
+              <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener">CC BY 2.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Youngwood</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3AYoungwoodPA.jpg" target="_blank" rel="noopener">YoungwoodPA</a> by Cramerwiki,
+              <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Penn Township</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3ABushy_Run_monument.JPG" target="_blank" rel="noopener">Bushy Run monument</a> by Kevin Myers,
+              <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Hempfield Township</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3AFarm_buildings_alongside_Pennsylvania_Turnpike_as_seen_from_North_Center_Street_overpass%2C_New_Stanton%2C_Pennsylvania_-_20190901.jpg" target="_blank" rel="noopener">Farm buildings alongside Pennsylvania Turnpike as seen from North Center Street overpass, New Stanton, Pennsylvania - 20190901</a> by Andre Carrotflower,
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Latrobe</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3AMain_Street%2C_Latrobe%2C_Pennsylvania_-_20210605.jpg" target="_blank" rel="noopener">Main Street, Latrobe, Pennsylvania - 20210605</a> by Andre Carrotflower,
+              <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+          <li class="credit">
+            <span class="credit-area">Mount Pleasant</span>
+            <span class="credit-text">
+              <a href="https://commons.wikimedia.org/wiki/File%3ADoughboy_Statue_Mount_Pleasant_Pennsylvania.jpg" target="_blank" rel="noopener">Doughboy Statue Mount Pleasant Pennsylvania</a> by Canadian2006,
+              <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>, via Wikimedia Commons. Cropped and resized.
+            </span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+</BaseLayout>
+
+<style>
+  .credits-page { padding: var(--space-20) 0 var(--space-24); }
+  .credits-header { margin-bottom: var(--space-12); }
+  .credits-title { font-family: var(--font-display); font-size: var(--text-4xl); text-transform: uppercase; letter-spacing: 0.02em; margin: 0 0 var(--space-4); }
+  .credits-intro { color: var(--color-text-muted); font-size: var(--text-lg); line-height: 1.65; max-width: 640px; margin: 0; }
+  .credits-section h2 { font-family: var(--font-display); font-size: var(--text-2xl); margin: 0 0 var(--space-6); }
+  .credit-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-border); }
+  .credit { display: grid; grid-template-columns: 180px 1fr; gap: var(--space-4); padding: var(--space-4) 0; border-bottom: 1px solid var(--color-border); font-size: var(--text-sm); line-height: 1.6; }
+  .credit-area { font-weight: 700; color: var(--color-text); }
+  .credit-text { color: var(--color-text-muted); }
+  .credit-text a { color: var(--color-text); text-decoration: underline; text-underline-offset: 2px; }
+  .credit-text a:hover { color: var(--color-accent-600); }
+  @media (max-width: 640px) { .credit { grid-template-columns: 1fr; gap: var(--space-1); } }
+</style>

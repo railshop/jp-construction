@@ -61,7 +61,6 @@ const {
               ) : (
                 <div class="service-card-media-fallback" aria-hidden="true"></div>
               )}
-              <span class="service-card-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
             </div>
             <div class="service-card-body">
               <div class="service-card-header">
@@ -157,26 +156,6 @@ const {
       linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 40px 40px;
-  }
-
-  .service-card-num {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: var(--space-1) var(--space-3);
-    background: var(--color-brand-950);
-    color: rgba(255, 255, 255, 0.55);
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    font-variant-numeric: tabular-nums;
-    transition: color var(--transition-base), background var(--transition-base);
-  }
-
-  .service-card:hover .service-card-num {
-    background: var(--color-accent-500);
-    color: #ffffff;
   }
 
   /* Body */

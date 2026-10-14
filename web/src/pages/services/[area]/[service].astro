@@ -127,7 +127,9 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 }}>
 
   <!-- Combo hero -->
-  <div class="combo-hero">
+  <div class="combo-hero" style={service.image
+      ? `background-image: linear-gradient(to right, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.68) 55%, rgba(10,10,10,0.35) 100%), linear-gradient(to top, rgba(10,10,10,0.55) 0%, transparent 50%), url('${service.image}'); background-size: cover; background-position: center;`
+      : undefined}>
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href={homeUrl()}>Home</a>
@@ -305,7 +307,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   <!-- Final CTA -->
   <CtaBanner
     headline={content.ctaHeadline}
-    subheadline={`Licensed, insured, and local to ${area.name}. Get your free estimate today.`}
+    subheadline={`Based in ${business.address.city}, licensed and insured. Estimates are free.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}

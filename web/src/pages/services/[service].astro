@@ -67,7 +67,9 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 }}>
 
   <!-- Service hero -->
-  <div class="service-hero">
+  <div class="service-hero" style={service.image
+      ? `background-image: linear-gradient(to right, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.68) 55%, rgba(10,10,10,0.35) 100%), linear-gradient(to top, rgba(10,10,10,0.55) 0%, transparent 50%), url('${service.image}'); background-size: cover; background-position: center;`
+      : undefined}>
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href={homeUrl()}>Home</a>
@@ -150,7 +152,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
   <!-- CTA -->
   <CtaBanner
     headline={`Need ${service.name} in ${business.address.city}?`}
-    subheadline={`Call us or request a free quote online. We respond quickly.`}
+    subheadline={`Call or send the details online. We get back to you within a business day.`}
     primaryCta={{ label: 'Get an Estimate', href: '/contact/' }}
     phone={business.phone}
     phoneHref={business.phoneHref}
