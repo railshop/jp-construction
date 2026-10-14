@@ -20,7 +20,7 @@ export const business: Business = {
   phone: '(724) 989-2557',
   phoneHref: 'tel:+17249892557',
   email: 'estimating@jpoperations.com',
-  website: 'https://jpconstructiongroup.com',
+  website: 'https://buildwithjp.com',
   address: {
     street: '10501 Station St',
     city: 'North Huntingdon',
