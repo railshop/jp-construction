@@ -95,7 +95,7 @@ const config: SiteConfig = {
 
   cmsMode: 'local', // 'sanity' | 'local'
 
-  siteUrl: 'https://buildwithjp.com',
+  siteUrl: 'https://jpconstructiongroup.com',
   siteName: 'JP Construction',
   siteDescription: 'Custom home building, additions, pole buildings, and commercial construction in North Huntingdon and Westmoreland County, PA.',
 
@@ -110,7 +110,7 @@ const config: SiteConfig = {
     campaignLandingPages: false,
   },
 
-  ga4Id: undefined,                 // 'G-XXXXXXXXXX' from GA4 > Admin > Data Streams
+  ga4Id: 'G-JLR9KPH85T',
   gtmId: undefined,                 // 'GTM-XXXXXXX' if using Tag Manager instead
   googleSiteVerification: undefined, // token from Search Console > Settings > Ownership verification > HTML tag
   googleMapsApiKey: undefined,
