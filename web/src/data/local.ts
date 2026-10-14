@@ -20,7 +20,7 @@ export const business: Business = {
   phone: '(724) 989-2557',
   phoneHref: 'tel:+17249892557',
   email: 'estimating@jpoperations.com',
-  website: 'https://buildwithjp.com',
+  website: 'https://jpconstructiongroup.com',
   address: {
     street: '10501 Station St',
     city: 'North Huntingdon',
@@ -33,7 +33,7 @@ export const business: Business = {
     { days: 'Saturday',        hours: 'By Appointment' },
     { days: 'Sunday',          hours: 'Closed' },
   ],
-  license: '', // TODO: add PA HIC number from Jake (e.g. 'PA123456'); footer and contact page show it when set
+  license: 'PA HIC #PA202954',
   yearEstablished: 2015,
   serviceRadius: 'Westmoreland County and surrounding areas',
   schemaType: 'GeneralContractor',
