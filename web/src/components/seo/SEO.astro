@@ -27,7 +27,7 @@ interface Props {
 const { seo } = Astro.props;
 
 const canonical = seo.canonicalURL || Astro.url.href;
-const ogImage   = seo.ogImage || `${config.siteUrl}/images/og-default.jpg`;
+const ogImage   = seo.ogImage || `${config.siteUrl}/images/og-share.jpg`;
 const fullTitle = `${seo.title} | ${config.siteName}`;
 
 // Build BreadcrumbList schema
