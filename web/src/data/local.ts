@@ -53,7 +53,7 @@ export const services: Service[] = [
     priceRange: { min: 250000, max: 1200000 },
     emergency: false,
     icon: 'home',
-    image: '/images/svc-custom-home.jpg',
+    image: '/images/svc-custom-home.webp',
     processSteps: [
       { title: 'Plan & Evaluate', description: 'We walk the lot with you, talk through what you want, and set a realistic scope, budget, and timeline.' },
       { title: 'Design & Permit', description: 'We coordinate with your architect to finalize blueprints and manage all permit applications with local municipalities.' },
@@ -70,7 +70,7 @@ export const services: Service[] = [
     priceRange: { min: 35000, max: 350000 },
     emergency: false,
     icon: 'plus-square',
-    image: '/images/svc-additions.jpg',
+    image: '/images/svc-additions.webp',
     processSteps: [
       { title: 'Assess & Design', description: 'We assess your existing structure and lot, discuss the scope, and coordinate with a licensed designer on permit-ready drawings.' },
       { title: 'Permit & Approve', description: 'We handle all permit applications and manage any HOA approval requirements before a single shovel hits the ground.' },
@@ -87,7 +87,7 @@ export const services: Service[] = [
     priceRange: { min: 30000, max: 250000 },
     emergency: false,
     icon: 'warehouse',
-    image: '/images/svc-pole-buildings.jpg',
+    image: '/images/svc-pole-buildings.webp',
     processSteps: [
       { title: 'Site & Size', description: 'We evaluate access, drainage, and setbacks, then size the building and door configuration around how you will actually use it.' },
       { title: 'Permit & Engineer', description: 'Engineered drawings and permit applications are handled for you, including any township zoning requirements.' },
@@ -104,7 +104,7 @@ export const services: Service[] = [
     priceRange: { min: 25000, max: 2000000 },
     emergency: false,
     icon: 'building',
-    image: '/images/svc-commercial.jpg',
+    image: '/images/svc-commercial.webp',
     processSteps: [
       { title: 'Assess & Plan', description: 'We review your site or space, define the scope, and produce a construction plan that meets your operational needs and local code.' },
       { title: 'Design & Permit', description: 'We manage commercial permitting and coordinate with your architect or engineer on permit-ready drawings.' },
@@ -121,7 +121,7 @@ export const services: Service[] = [
     priceRange: { min: 400000, max: 5000000 },
     emergency: false,
     icon: 'buildings',
-    image: '/images/svc-multi-family.jpg',
+    image: '/images/svc-multi-family.webp',
     processSteps: [
       { title: 'Feasibility & Budget', description: 'We review your site and drawings, flag constructability issues early, and build a budget you can take to your lender.' },
       { title: 'Site & Permits', description: 'Site work, utilities, and stormwater are handled in-house while we manage permitting across every required jurisdiction.' },
@@ -138,7 +138,7 @@ export const services: Service[] = [
     priceRange: { min: 2500, max: 25000 },
     emergency: false,
     icon: 'blueprint',
-    image: '/images/svc-design.jpg',
+    image: '/images/svc-design.webp',
     processSteps: [
       { title: 'Scope & Document', description: 'We define the project scope, identify all required permit types, and document everything before any design work begins.' },
       { title: 'Design & Engineer', description: 'Structural design and architectural drawings come together as stamped, permit-ready documents for your project.' },
@@ -163,7 +163,7 @@ export const serviceAreas: ServiceArea[] = [
     description: 'Our home base. JP Construction and JP Operations are both based in North Huntingdon, so this is where most of our crews live and where we have the most finished work to show you.',
     zipCodes: ['15642'],
     responseTime: 'Same day',
-    image: '/images/area-north-huntingdon.jpg',
+    image: '/images/area-north-huntingdon.webp',
     localContext: {
       propertyCharacter: 'predominantly suburban township with a mix of post-WWII ranch homes, 1970s-80s split-levels, and newer developments on larger lots; strong owner-occupancy rates with pride in property',
       housingAge: 'housing stock ranges from 1950s ranch-era homes through 1990s colonials to newer infill construction; significant demand for updating and expanding older ranches',
@@ -189,7 +189,7 @@ export const serviceAreas: ServiceArea[] = [
     description: 'Irwin sits right next to our shop. Most of the housing is pre-war to mid-century, which means a lot of our work here is additions, garages, porch rebuilds, and full restorations on older homes.',
     zipCodes: ['15642'],
     responseTime: '15 minutes',
-    image: '/images/area-irwin.jpg',
+    image: '/images/area-irwin.webp',
     localContext: {
       propertyCharacter: 'compact historic borough with pre-WWII housing stock including Victorian-era, Foursquare, and early Craftsman homes on narrow urban lots; established tree-lined streets with character architecture',
       housingAge: 'predominantly 1900-1950 construction with significant post-war bungalow development; older homes with deferred maintenance creating strong demand for restoration-grade additions and garage builds',
@@ -215,7 +215,7 @@ export const serviceAreas: ServiceArea[] = [
     description: 'Greensburg has a little of everything: Victorian-era streets near downtown, mid-century neighborhoods, and newer plans on the edges. We do additions and garages in town and custom homes and pole buildings on the outskirts.',
     zipCodes: ['15601'],
     responseTime: '30 minutes',
-    image: '/images/area-greensburg.jpg',
+    image: '/images/area-greensburg.webp',
     localContext: {
       propertyCharacter: 'county seat city with layered housing stock: Victorian and Queen Anne architecture near downtown, solid mid-century brick ranches in established neighborhoods, and newer construction on the city periphery; strong mix of owner-occupied and rental properties',
       housingAge: 'oldest housing stock of all service areas; significant late 1800s through 1930s construction downtown; 1940s-1960s brick ranches in outlying neighborhoods; newer development along Route 30 corridor',
@@ -241,7 +241,7 @@ export const serviceAreas: ServiceArea[] = [
     description: 'Trafford is a small borough on the Westmoreland-Allegheny line with tight lots and older houses. Additions and detached garages make up most of our work here, along with structural repairs on homes that have been added onto before.',
     zipCodes: ['15085'],
     responseTime: '20 minutes',
-    image: '/images/area-trafford.jpg',
+    image: '/images/area-trafford.webp',
     localContext: {
       propertyCharacter: 'compact former railroad borough with tight-knit residential streets; predominantly small to mid-size homes from the early-to-mid 20th century; strong working-class homeownership culture with pride in maintenance and improvement',
       housingAge: 'primarily 1910-1950 construction; Foursquare and bungalow-style homes dominant; some post-war Cape Cods; housing is well-maintained but smaller than suburban counterparts, creating demand for additions over moving',
@@ -267,7 +267,7 @@ export const serviceAreas: ServiceArea[] = [
     description: 'Murrysville has large wooded lots and a lot of homes from the 1980s and 1990s that are due for a bigger kitchen, a master suite, or a three-car garage. We also build custom homes on the open lots that are still available.',
     zipCodes: ['15668'],
     responseTime: '25 minutes',
-    image: '/images/area-murrysville.jpg',
+    image: '/images/area-murrysville.webp',
     localContext: {
       propertyCharacter: 'affluent Pittsburgh suburb with newer construction on large wooded lots; strong demand for custom homes, significant additions, and high-finish garage builds; community known for high property values and quality-conscious homeowners',
       housingAge: 'primarily 1970s-2000s construction; Colonial, Traditional, and newer Contemporary styles on half-acre to multi-acre lots; custom home market is active with buyers who want quality over speed',
@@ -293,7 +293,7 @@ export const serviceAreas: ServiceArea[] = [
     description: 'Youngwood is a small borough south of Greensburg with well-kept older homes. We handle garages, additions, and structural updates here, plus pole buildings on the properties with more land.',
     zipCodes: ['15697'],
     responseTime: '35 minutes',
-    image: '/images/area-youngwood.jpg',
+    image: '/images/area-youngwood.webp',
     localContext: {
       propertyCharacter: 'small borough with solid working-class housing stock; well-maintained mid-century homes on modest lots; homeowners who invest carefully and expect honest, quality work from local contractors',
       housingAge: 'primarily 1940s-1970s construction; Cape Cods, ranches, and split-levels predominate; homes are often well-maintained with some deferred improvement work creating opportunity for additions and garage builds',
@@ -318,7 +318,7 @@ export const serviceAreas: ServiceArea[] = [
     nearby: ['north-huntingdon', 'trafford', 'murrysville'],
     description: 'Penn Township sits between North Huntingdon and Murrysville and is still growing. We build in the established neighborhoods around Harrison City and Claridge and in the newer plans going up across the township.',
     zipCodes: ['15644', '15636', '15675'],
-    image: '/images/area-penn-township.jpg',
+    image: '/images/area-penn-township.webp',
     localContext: {
       propertyCharacter: 'growing suburban township anchored by Harrison City and Claridge; mix of established mid-century homes and active new-construction plans on former farmland',
       housingAge: 'broad range from 1950s-1970s established neighborhoods to homes built in the last decade; steady demand for both new builds and updates to older stock',
@@ -343,7 +343,7 @@ export const serviceAreas: ServiceArea[] = [
     nearby: ['greensburg', 'youngwood', 'mount-pleasant'],
     description: 'Hempfield is the biggest township in the county and wraps around Greensburg, with suburban neighborhoods on one side and farmland on the other. That range means additions and garages in the plans and pole buildings and custom homes on the acreage.',
     zipCodes: ['15601', '15644'],
-    image: '/images/area-hempfield.jpg',
+    image: '/images/area-hempfield.webp',
     localContext: {
       propertyCharacter: 'sprawling suburban township surrounding Greensburg; established brick ranches and colonials in mature plans alongside rural properties with acreage',
       housingAge: 'largely 1950s-1990s construction in established neighborhoods with pockets of newer development; many homes at the age where additions and garage projects make sense',
@@ -368,7 +368,7 @@ export const serviceAreas: ServiceArea[] = [
     nearby: ['greensburg', 'hempfield', 'mount-pleasant'],
     description: 'Latrobe and the surrounding Unity Township give us two kinds of work: additions and garages on the older city streets, and pole buildings, custom homes, and commercial projects on the rural land outside town.',
     zipCodes: ['15650'],
-    image: '/images/area-latrobe.jpg',
+    image: '/images/area-latrobe.webp',
     localContext: {
       propertyCharacter: 'classic small city neighborhoods with early-to-mid 1900s homes, surrounded by Unity Township\'s rural properties and newer suburban plans',
       housingAge: 'city housing stock largely 1900-1960; Unity Township adds 1970s-2000s suburban homes and farm properties, creating demand across the full project range',
@@ -393,7 +393,7 @@ export const serviceAreas: ServiceArea[] = [
     nearby: ['greensburg', 'youngwood', 'hempfield'],
     description: 'Mount Pleasant is a historic borough in the southern part of the county with well-maintained older homes and a lot of rural property around it. We do additions, garages, and pole buildings here.',
     zipCodes: ['15666'],
-    image: '/images/area-mount-pleasant.jpg',
+    image: '/images/area-mount-pleasant.webp',
     localContext: {
       propertyCharacter: 'historic borough with a walkable main street and early 1900s homes, surrounded by rural townships with farmland and larger parcels',
       housingAge: 'borough homes largely 1890-1950 with solid masonry construction; surrounding townships add mid-century and newer rural homes',

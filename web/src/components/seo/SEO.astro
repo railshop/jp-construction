@@ -12,6 +12,8 @@ export interface SEOProps {
   description: string;
   canonicalURL?: string;
   ogImage?: string;
+  /** Hero image to preload for LCP. Use on pages whose hero is a CSS/inline background. */
+  preloadImage?: string;
   ogType?: 'website' | 'article';
   publishDate?: string;
   modifiedDate?: string;
@@ -65,6 +67,7 @@ if (breadcrumbSchema) schemas.push(breadcrumbSchema);
 <title>{fullTitle}</title>
 <meta name="description" content={seo.description} />
 <link rel="canonical" href={canonical} />
+{seo.preloadImage && <link rel="preload" as="image" href={seo.preloadImage} fetchpriority="high" />}
 {config.googleSiteVerification && <meta name="google-site-verification" content={config.googleSiteVerification} />}
 {seo.noindex && <meta name="robots" content="noindex, nofollow" />}
 

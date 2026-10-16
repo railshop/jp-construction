@@ -51,6 +51,7 @@ import { homeUrl, aboutUrl, contactUrl, servicesUrl, areasUrl, blogUrl, projects
 
 <BaseLayout seo={{
   title: `${area.name} Construction Services`,
+  preloadImage: area.image,
   description: `${business.name} serves ${area.name}${area.county ? ', ' + area.county : ''}. Professional, licensed, and insured construction services. Free estimates.`,
   schema: localSchema,
   breadcrumbs: [

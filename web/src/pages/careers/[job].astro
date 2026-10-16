@@ -47,6 +47,7 @@ const jobSchema = {
 
 <BaseLayout seo={{
   title: `${job.title} Job Opening`,
+  preloadImage: '/images/hero-careers.webp',
   description: `${job.summary} Apply now.`,
   schema: jobSchema,
   breadcrumbs: [
@@ -196,7 +197,7 @@ const jobSchema = {
     background-image:
       linear-gradient(to right, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.68) 55%, rgba(10,10,10,0.35) 100%),
       linear-gradient(to top, rgba(10,10,10,0.55) 0%, transparent 50%),
-      url('/images/hero-careers.jpg');
+      url('/images/hero-careers.webp');
     background-size: cover;
     background-position: center 40%;
   }

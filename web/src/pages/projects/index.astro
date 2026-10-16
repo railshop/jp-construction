@@ -15,6 +15,7 @@ const projects = await getProjects();
 
 <BaseLayout seo={{
   title: `Our Work | Projects & Portfolio`,
+  preloadImage: '/images/hero-projects.webp',
   description: `Completed projects by ${business.name}: custom homes, additions, garages, commercial renovations, and whole-property restorations across Westmoreland County.`,
   breadcrumbs: [{ name: 'Projects', url: '/projects/' }],
 }}>
@@ -73,7 +74,7 @@ const projects = await getProjects();
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/hero-projects.jpg');
+    background-image: url('/images/hero-projects.webp');
     background-size: cover;
     background-position: center 55%;
   }

@@ -19,6 +19,7 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
 
 <BaseLayout seo={{
   title: `Service Areas in Westmoreland County`,
+  preloadImage: '/images/hero-areas.webp',
   description: `${business.name} serves ${business.serviceRadius || business.address.city + ' and surrounding areas'}. View all the communities we cover.`,
   breadcrumbs: [{ name: 'Service Areas', url: '/areas/' }],
 }}>
@@ -155,7 +156,7 @@ const tertiary  = areas.filter(a => a.priority === 'tertiary');
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/hero-areas.jpg');
+    background-image: url('/images/hero-areas.webp');
     background-size: cover;
     background-position: center 60%;
   }

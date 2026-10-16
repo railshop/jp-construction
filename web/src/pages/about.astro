@@ -32,6 +32,7 @@ const aboutSchema = {
 
 <BaseLayout seo={{
   title: 'About Us',
+  preloadImage: '/images/hero-about.webp',
   description: `${business.name} is a ${business.address.city}-based general contractor serving ${business.serviceRadius} since ${business.yearEstablished || 'day one'}. Licensed, insured, locally owned.`,
   schema: aboutSchema,
   breadcrumbs: [{ name: 'About', url: '/about/' }],
@@ -106,7 +107,7 @@ const aboutSchema = {
         <div class="owners-image-col">
           <div class="owners-image-wrap">
             <img
-              src="/images/about-crew.jpg"
+              src="/images/about-crew.webp"
               alt="JP Construction crew on a job site in Westmoreland County, PA"
               loading="lazy"
               width="800"
@@ -201,7 +202,7 @@ const aboutSchema = {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/hero-about.jpg');
+    background-image: url('/images/hero-about.webp');
     background-size: cover;
     background-position: center 35%;
   }

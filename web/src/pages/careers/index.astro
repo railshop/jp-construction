@@ -14,6 +14,7 @@ const business = await getBusiness();
 
 <BaseLayout seo={{
   title: 'Careers | Join the JP Team',
+  preloadImage: '/images/hero-careers.webp',
   description: `Open positions at ${business.name} and JP Operations in North Huntingdon, PA. Local construction and excavation work, home every night.`,
   breadcrumbs: [{ name: 'Careers', url: '/careers/' }],
 }}>
@@ -81,7 +82,7 @@ const business = await getBusiness();
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('/images/hero-careers.jpg');
+    background-image: url('/images/hero-careers.webp');
     background-size: cover;
     background-position: center 40%;
   }
